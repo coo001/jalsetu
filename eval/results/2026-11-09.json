@@ -1,8 +1,8 @@
 {
   "statement": "These are reproducibility and safety checks on real government records, not field impact. No field users or remediation outcomes yet.",
   "command": "python eval/run_eval.py",
-  "git_commit": "a559c0af6340c06549b70d798e79d64a7fb39dd8",
-  "timestamp_utc": "2026-11-09T06:29:36Z",
+  "git_commit": "ee45882125289675b52ea87e50b86f28c203c549",
+  "timestamp_utc": "2026-11-09T06:38:18Z",
   "snapshot": "2026-11-09",
   "snapshot_hashes": {
     "probe_log.json": "a8cf25f4afd7e43e1d9e21ad04bb0bde9b3cc352026956a75578c7127741600f",
