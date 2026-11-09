@@ -133,8 +133,8 @@ Notes on what these numbers mean:
   Amendment No.1 (June 2015) substitutes "No relaxation" for 0.05 in Table 3 (x), so 0.01 mg/l is the permissible
   limit. Verified 2026-11-09 in a consolidated BIS copy "Incorporating Amendments 1 (2015), 2 (2018), 3&4(2021)"
   (third-party host, sha256_16 `54348d5f9036b6d1`; F, NO3 and E. coli rows unchanged) and in a scan of the
-  Amendment No.1 sheet inside third-party course slides (OCR). The official BIS portal lists the amendment file as
-  not available. Records still carrying 0.05 go to `needs_review` (LIMIT_MISMATCH). There are no arsenic records in
+  Amendment No.1 sheet inside third-party course slides (OCR). The amendment sheet itself was not obtained from the
+  official BIS portal. Records still carrying 0.05 go to `needs_review` (LIMIT_MISMATCH). There are no arsenic records in
   the AP 2024-25 snapshot; arsenic paths are tested with synthetic records only.
 - **Deployment counters are not impact.** `/api/stats` and the Evaluation page show anonymous in-memory page
   counters since the last restart (bots and `/healthz` excluded, no IP/UA/cookies/query/sample ids stored; snapshot
