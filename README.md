@@ -143,6 +143,9 @@ Notes on what these numbers mean:
   contains the WQMIS district spelling (e.g. L10 spells "Sri Satya Sai", WQ6 spells "SRI SATHYA SAI"); no fuzzy
   matching is done.
 
+### Second code path check of the public samples
+`python eval/independent_check.py AP` and `... BR` re-derive selection, verdict, ratio, lab capability, same-district flag and advice ids for `eval/public_sample_30.csv` and `eval/public_sample_30_BR.csv` from the raw CSVs without importing `jalsetu`. Result 2026-11-09: AP 300/300 checks, BR 300/300 checks, 0 mismatching rows (`eval/results/independent_check_30*.json`). This is a second implementation by the same solo builder, not an external or field validation. Five AP rows were also checked by hand (value ÷ limit, lab parameter list, district match): no discrepancy.
+
 ## Design choices made without asking
 
 - **Duplicate rule is per (sample_id, parameter).** 7 sample ids appear twice in the AP data, each time once for

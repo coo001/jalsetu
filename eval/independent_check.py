@@ -4,15 +4,19 @@ Written separately from the jalsetu package (no imports from it) by the same sol
 so it is a second code path, NOT an external or field validation.
 Reads only the raw snapshot CSVs and the published public sample, re-derives each field
 with its own rules typed from IS 10500:2012 (as amended) and the L10 lab list, and reports
-every mismatch. Usage: python eval/independent_check.py
+every mismatch. Usage: python eval/independent_check.py [AP|BR]
 """
 import csv, hashlib, json, re, sys, datetime, os
 
 ROOT = os.environ.get("JALSETU_ROOT") or os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SNAP = os.path.join(ROOT, "data", "snapshots", "2026-11-09")
-PUB = os.path.join(ROOT, "eval", "public_sample_30.csv")
-OUT_CSV = os.path.join(ROOT, "eval", "independent_check_30.csv")
-OUT_JSON = os.path.join(ROOT, "eval", "results", "independent_check_30.json")
+STATE = (sys.argv[1] if len(sys.argv) > 1 else "AP").upper()
+SFX = "" if STATE == "AP" else "_" + STATE
+RAW_FILE = {"AP": "wq6_AP_2024-2025_samples.csv", "BR": "wq6_BR_2024-2025_arsenic_samples.csv"}[STATE]
+LAB_FILE = {"AP": "wq_labs_AP_L10.csv", "BR": "wq_labs_BR_L10.csv"}[STATE]
+PUB = os.path.join(ROOT, "eval", f"public_sample_30{SFX}.csv")
+OUT_CSV = os.path.join(ROOT, "eval", f"independent_check_30{SFX}.csv")
+OUT_JSON = os.path.join(ROOT, "eval", "results", f"independent_check_30{SFX}.json")
 
 # Own limit table (permissible, unit) typed from IS 10500:2012 Tables 2, 3, 6 (Amend. No.1 2015 for arsenic)
 LIMITS = {"Fluoride": (1.5, "mg/l"), "Nitrate": (45.0, "mg/l"),
@@ -39,8 +43,8 @@ def parse_value(v):
 
 
 def main():
-    raw = list(csv.DictReader(open(os.path.join(SNAP, "wq6_AP_2024-2025_samples.csv"), encoding="utf-8")))
-    labs = list(csv.DictReader(open(os.path.join(SNAP, "wq_labs_AP_L10.csv"), encoding="utf-8")))
+    raw = list(csv.DictReader(open(os.path.join(SNAP, RAW_FILE), encoding="utf-8")))
+    labs = list(csv.DictReader(open(os.path.join(SNAP, LAB_FILE), encoding="utf-8")))
     pub = list(csv.DictReader(open(PUB, encoding="utf-8")))
     labs_by_name = {norm(l["name"]): l for l in labs}
 
@@ -58,7 +62,7 @@ def main():
         checks = {}
         checks["raw_record_found"] = r is not None
         if r:
-            checks["raw_fields_identical"] = all(p[c] == r[c] for c in r.keys())
+            checks["raw_fields_identical"] = all(p.get(c) == r[c] for c in r.keys())
         val, unit = parse_value(p["value"])
         lim, lim_unit = LIMITS.get(p["param"], (None, None))
         exceeds = (val is not None and lim is not None and unit == lim_unit and val > lim)
@@ -89,7 +93,7 @@ def main():
     summary = {"name": "independent re-check of public sample 30",
                "nature": "second code path by the same solo builder; not external, not field validation",
                "run_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds"),
-               "command": "python eval/independent_check.py",
+               "command": "python eval/independent_check.py " + STATE, "state": STATE,
                "selection_rule_reproduced": selection_ok,
                "rows": len(rows), "rows_with_any_mismatch": mismatches,
                "checks_total": sum(r["checks_total"] for r in rows),

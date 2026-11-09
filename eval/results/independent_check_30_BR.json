@@ -1,0 +1,12 @@
+{
+ "name": "independent re-check of public sample 30",
+ "nature": "second code path by the same solo builder; not external, not field validation",
+ "run_utc": "2026-11-09T06:53:15+00:00",
+ "command": "python eval/independent_check.py BR",
+ "state": "BR",
+ "selection_rule_reproduced": true,
+ "rows": 30,
+ "rows_with_any_mismatch": 0,
+ "checks_total": 300,
+ "checks_passed": 300
+}
