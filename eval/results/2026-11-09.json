@@ -1,12 +1,14 @@
 {
   "statement": "These are reproducibility and safety checks on real government records, not field impact. No field users or remediation outcomes yet.",
   "command": "python eval/run_eval.py",
-  "git_commit": "ee45882125289675b52ea87e50b86f28c203c549",
-  "timestamp_utc": "2026-11-09T06:38:18Z",
+  "git_commit": "651fca9ffb20f4df92fa4fcc022f4e71ad2c651d",
+  "timestamp_utc": "2026-11-09T06:52:30Z",
   "snapshot": "2026-11-09",
   "snapshot_hashes": {
+    "br_arsenic_log.json": "98b79f07dfcd4a1ce83cff80149ebedbfe632ba9c86a61673765c89aefcd1c83",
     "probe_log.json": "a8cf25f4afd7e43e1d9e21ad04bb0bde9b3cc352026956a75578c7127741600f",
     "wq6_AP_2024-2025_samples.csv": "ec97a3919b5720a7508165bd0e9c8ed476721a674f48fd81dd171809e1028447",
+    "wq6_BR_2024-2025_arsenic_samples.csv": "c0cb37914d12a92d5a83d853d8f37e2587a2904596520d41f708814a41b37eb6",
     "wq6_states_2024-2025.csv": "a3e2f0697f0fac4205758f09345a2ccba59908b984cf97b546dd888da789ea12",
     "wq6_states_2025-2026.csv": "53aa55f71a8f88df3007409e9e3361157692bc1b4df18ee05dd41cb457ce004e",
     "wq_labs_AP_L10.csv": "d4dd313c57a90ca5843f8f5292bceac95756ab2ce24cf4189728270c67f376bc",
@@ -213,6 +215,102 @@
       "measured": "30 rows; statuses {'ready': 30}",
       "passed": true,
       "note": "sha256(sample_id) rule; eval/public_sample_30.csv"
+    },
+    {
+      "id": "E1_BR",
+      "name": "Government verdict reproduction (reproduction, not independent accuracy)",
+      "target": "all records with numeric values exceed by our rule",
+      "measured": "592/592 numeric records exceed (of 592 records)",
+      "passed": true,
+      "note": ""
+    },
+    {
+      "id": "E2a_BR",
+      "name": "Candidate labs whose L10 list lacks the parameter",
+      "target": "0",
+      "measured": "0 of 2960 candidate slots (592 ready packets)",
+      "passed": true,
+      "note": ""
+    },
+    {
+      "id": "E2b_BR",
+      "name": "Ready packets with a same-district candidate",
+      "target": "report",
+      "measured": "592 with / 0 without (top lab same-district: 592)",
+      "passed": true,
+      "note": "same-district = district name appears in L10 lab name or address"
+    },
+    {
+      "id": "E2e_BR",
+      "name": "Lab order stable under input shuffles",
+      "target": "0 unstable",
+      "measured": "0 unstable of 592",
+      "passed": true,
+      "note": ""
+    },
+    {
+      "id": "E2f_BR",
+      "name": "Sample lab names not in L10",
+      "target": "report",
+      "measured": "before normalization 0/6 names (0 records); after 0/6",
+      "passed": true,
+      "note": "whitespace/case normalization"
+    },
+    {
+      "id": "E3.FP_BR",
+      "name": "False positives on the 592 original records",
+      "target": "0",
+      "measured": "0 of 592",
+      "passed": true,
+      "note": "LAB_NOT_IN_L10 warnings (non-blocking): 0"
+    },
+    {
+      "id": "E4a_BR",
+      "name": "Template letters pass fact_guard",
+      "target": "592/592",
+      "measured": "592/592",
+      "passed": true,
+      "note": ""
+    },
+    {
+      "id": "E6a_BR",
+      "name": "Advice lines with a source id present in sources.json",
+      "target": "4144/4144",
+      "measured": "4144/4144 (verbatim from table: 4144)",
+      "passed": true,
+      "note": ""
+    },
+    {
+      "id": "E6b_BR",
+      "name": "needs_review packets with any advice or letter",
+      "target": "0",
+      "measured": "0 of 0",
+      "passed": true,
+      "note": ""
+    },
+    {
+      "id": "E6c_BR",
+      "name": "'boil' text in chemical packets (except nitrate H_N2)",
+      "target": "0",
+      "measured": "0",
+      "passed": true,
+      "note": "real BR arsenic packets"
+    },
+    {
+      "id": "VALUE_EXTREME_BR",
+      "name": "Records flagged VALUE_EXTREME (likely unit entry error)",
+      "target": "report",
+      "measured": "2",
+      "passed": true,
+      "note": "U701316S22784938-arsenic 228.000 (mg/l); U735548S22703996-arsenic 1.880 (mg/l)"
+    },
+    {
+      "id": "E7_BR",
+      "name": "Public sample of 30 records for manual checking",
+      "target": "30 rows written",
+      "measured": "30 rows; statuses {'ready': 30}",
+      "passed": true,
+      "note": "sha256(sample_id) rule; eval/public_sample_30_BR.csv"
     }
   ],
   "details": {
@@ -228,27 +326,14 @@
       }
     },
     "E2": {
+      "state": "AP",
+      "l10_labs": 138,
       "ready_packets": 283,
       "candidate_labs_checked": 1415,
       "unsuitable": 0,
       "packets_with_same_district_candidate": 251,
       "packets_without_same_district_candidate": 32,
       "packets_top_lab_same_district": 251,
-      "synthetic_arsenic": {
-        "status": "ready",
-        "labs_total": 3,
-        "labs": [
-          "SUNKESULA WTP",
-          "Peddakadubur WTP",
-          "Sathanur WTP"
-        ]
-      },
-      "synthetic_zero_lab": {
-        "status": "no_candidate_lab",
-        "letter": null,
-        "note": "No lab in this state's L10 list tests this parameter. Contact the State Level laboratory.",
-        "how": "arsenic record routed against AP L10 with the 3 arsenic-capable labs removed"
-      },
       "tie_order_unstable_packets": 0,
       "shuffles_per_packet": 3,
       "sample_lab_names_distinct": 17,
@@ -265,6 +350,21 @@
         "names": 0,
         "records": 0,
         "list": []
+      },
+      "synthetic_arsenic": {
+        "status": "ready",
+        "labs_total": 3,
+        "labs": [
+          "SUNKESULA WTP",
+          "Peddakadubur WTP",
+          "Sathanur WTP"
+        ]
+      },
+      "synthetic_zero_lab": {
+        "status": "no_candidate_lab",
+        "letter": null,
+        "note": "No lab in this state's L10 list tests this parameter. Contact the State Level laboratory.",
+        "how": "arsenic record routed against AP L10 with the 3 arsenic-capable labs removed"
       }
     },
     "E3": {
@@ -394,6 +494,113 @@
         "U709176S19563033-fluoride",
         "U709176S19563063-fluoride",
         "U711594S23399782-nitrate"
+      ]
+    },
+    "E1_BR": {
+      "label": "reproduction, not independent accuracy",
+      "records": 592,
+      "numeric": 592,
+      "exceeds_by_our_rule": 592,
+      "by_param": {
+        "Total arsenic": 592
+      }
+    },
+    "E2_BR": {
+      "state": "BR",
+      "l10_labs": 123,
+      "ready_packets": 592,
+      "candidate_labs_checked": 2960,
+      "unsuitable": 0,
+      "packets_with_same_district_candidate": 592,
+      "packets_without_same_district_candidate": 0,
+      "packets_top_lab_same_district": 592,
+      "tie_order_unstable_packets": 0,
+      "shuffles_per_packet": 3,
+      "sample_lab_names_distinct": 6,
+      "not_in_l10_before_normalization": {
+        "names": 0,
+        "records": 0,
+        "list": []
+      },
+      "not_in_l10_after_normalization": {
+        "names": 0,
+        "records": 0,
+        "list": []
+      }
+    },
+    "E3_BR": {
+      "count": 0,
+      "ids": [],
+      "lab_not_in_l10_warnings": 0
+    },
+    "E4a_BR": {
+      "ready": 592,
+      "template_letters_passed": 592
+    },
+    "E6_BR": {
+      "packets_checked": 592,
+      "advice_lines": 4144,
+      "unsourced": 0,
+      "not_verbatim": 0,
+      "needs_review_packets": 0,
+      "needs_review_with_advice_or_letter": 0,
+      "forbidden_boil_lines": 0
+    },
+    "VALUE_EXTREME_BR": {
+      "rule": "chemical value >= 100 x permissible (warning, does not stop)",
+      "count": 2,
+      "records": [
+        {
+          "record_id": "U701316S22784938-arsenic",
+          "value": "228.000 (mg/l)",
+          "ratio": 22800.0,
+          "status": "ready"
+        },
+        {
+          "record_id": "U735548S22703996-arsenic",
+          "value": "1.880 (mg/l)",
+          "ratio": 188.0,
+          "status": "ready"
+        }
+      ]
+    },
+    "E7_BR": {
+      "rule": "sort records by sha256(sample_id) ascending (ties by record id), first 30",
+      "file": "eval/public_sample_30_BR.csv",
+      "statuses": {
+        "ready": 30
+      },
+      "record_ids": [
+        "U703835S25157302-arsenic",
+        "U701316S23970155-arsenic",
+        "U714185S19553115-arsenic",
+        "U735548S22704813-arsenic",
+        "U701316S22803371-arsenic",
+        "U735548S22720651-arsenic",
+        "U701316S22846643-arsenic",
+        "U735548S21679588-arsenic",
+        "U703835S22908511-arsenic",
+        "U701316S24682127-arsenic",
+        "U703835S25157356-arsenic",
+        "U735548S22680522-arsenic",
+        "U1218511S22334475-arsenic",
+        "U735548S22680672-arsenic",
+        "U735548S22743340-arsenic",
+        "U703835S22908937-arsenic",
+        "U701316S22668250-arsenic",
+        "U735548S22718995-arsenic",
+        "U735548S22825293-arsenic",
+        "U701316S22694736-arsenic",
+        "U701316S22808704-arsenic",
+        "U735548S22741461-arsenic",
+        "U701316S23162701-arsenic",
+        "U735548S22846452-arsenic",
+        "U701316S23163157-arsenic",
+        "U735548S22680652-arsenic",
+        "U701316S24684873-arsenic",
+        "U735548S22211070-arsenic",
+        "U1218511S22337493-arsenic",
+        "U701316S22807448-arsenic"
       ]
     }
   }
