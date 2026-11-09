@@ -1,0 +1,400 @@
+{
+  "statement": "These are reproducibility and safety checks on real government records, not field impact. No field users or remediation outcomes yet.",
+  "command": "python eval/run_eval.py",
+  "git_commit": "uncommitted",
+  "timestamp_utc": "2026-11-09T06:28:59Z",
+  "snapshot": "2026-11-09",
+  "snapshot_hashes": {
+    "probe_log.json": "a8cf25f4afd7e43e1d9e21ad04bb0bde9b3cc352026956a75578c7127741600f",
+    "wq6_AP_2024-2025_samples.csv": "ec97a3919b5720a7508165bd0e9c8ed476721a674f48fd81dd171809e1028447",
+    "wq6_states_2024-2025.csv": "a3e2f0697f0fac4205758f09345a2ccba59908b984cf97b546dd888da789ea12",
+    "wq6_states_2025-2026.csv": "53aa55f71a8f88df3007409e9e3361157692bc1b4df18ee05dd41cb457ce004e",
+    "wq_labs_AP_L10.csv": "d4dd313c57a90ca5843f8f5292bceac95756ab2ce24cf4189728270c67f376bc",
+    "wq_labs_BR_L10.csv": "7a89ed7dc56fb9340e2cdd36aa2e6ad567aecf27450068eebcb0d4ce507ca363"
+  },
+  "all_targets_met": true,
+  "summary": [
+    {
+      "id": "E1",
+      "name": "Government verdict reproduction (reproduction, not independent accuracy)",
+      "target": "all records with numeric values exceed by our rule",
+      "measured": "283/283 numeric records exceed (of 283 records)",
+      "passed": true,
+      "note": ""
+    },
+    {
+      "id": "E2a",
+      "name": "Candidate labs whose L10 list lacks the parameter",
+      "target": "0",
+      "measured": "0 of 1415 candidate slots (283 ready packets)",
+      "passed": true,
+      "note": ""
+    },
+    {
+      "id": "E2b",
+      "name": "Ready packets with a same-district candidate",
+      "target": "report",
+      "measured": "251 with / 32 without (top lab same-district: 251)",
+      "passed": true,
+      "note": "same-district = district name appears in L10 lab name or address"
+    },
+    {
+      "id": "E2c",
+      "name": "Synthetic arsenic case on AP L10",
+      "target": "ready, 3 candidate labs",
+      "measured": "ready, 3 labs",
+      "passed": true,
+      "note": ""
+    },
+    {
+      "id": "E2d",
+      "name": "Synthetic parameter with zero labs",
+      "target": "no_candidate_lab, no letter",
+      "measured": "no_candidate_lab, letter=none",
+      "passed": true,
+      "note": ""
+    },
+    {
+      "id": "E2e",
+      "name": "Lab order stable under input shuffles",
+      "target": "0 unstable",
+      "measured": "0 unstable of 283",
+      "passed": true,
+      "note": ""
+    },
+    {
+      "id": "E2f",
+      "name": "Sample lab names not in L10",
+      "target": "report",
+      "measured": "before normalization 3/17 names (19 records); after 0/17",
+      "passed": true,
+      "note": "whitespace/case normalization"
+    },
+    {
+      "id": "E3.VALUE_MISSING",
+      "name": "Error injection: VALUE_MISSING",
+      "target": "10/10 needs_review with VALUE_MISSING",
+      "measured": "10/10",
+      "passed": true,
+      "note": ""
+    },
+    {
+      "id": "E3.VALUE_NOT_NUMERIC",
+      "name": "Error injection: VALUE_NOT_NUMERIC",
+      "target": "10/10 needs_review with VALUE_NOT_NUMERIC",
+      "measured": "10/10",
+      "passed": true,
+      "note": ""
+    },
+    {
+      "id": "E3.UNIT_MISSING",
+      "name": "Error injection: UNIT_MISSING",
+      "target": "10/10 needs_review with UNIT_MISSING",
+      "measured": "10/10",
+      "passed": true,
+      "note": ""
+    },
+    {
+      "id": "E3.UNIT_MISMATCH",
+      "name": "Error injection: UNIT_MISMATCH",
+      "target": "10/10 needs_review with UNIT_MISMATCH",
+      "measured": "10/10",
+      "passed": true,
+      "note": ""
+    },
+    {
+      "id": "E3.UNKNOWN_PARAM",
+      "name": "Error injection: UNKNOWN_PARAM",
+      "target": "10/10 needs_review with UNKNOWN_PARAM",
+      "measured": "10/10",
+      "passed": true,
+      "note": ""
+    },
+    {
+      "id": "E3.LIMIT_MISMATCH",
+      "name": "Error injection: LIMIT_MISMATCH",
+      "target": "10/10 needs_review with LIMIT_MISMATCH",
+      "measured": "10/10",
+      "passed": true,
+      "note": ""
+    },
+    {
+      "id": "E3.BELOW_LIMIT_BUT_LISTED",
+      "name": "Error injection: BELOW_LIMIT_BUT_LISTED",
+      "target": "10/10 needs_review with BELOW_LIMIT_BUT_LISTED",
+      "measured": "10/10",
+      "passed": true,
+      "note": ""
+    },
+    {
+      "id": "E3.SAMPLE_ID_MISSING",
+      "name": "Error injection: SAMPLE_ID_MISSING",
+      "target": "10/10 needs_review with SAMPLE_ID_MISSING",
+      "measured": "10/10",
+      "passed": true,
+      "note": ""
+    },
+    {
+      "id": "E3.SAMPLE_ID_DUPLICATE",
+      "name": "Error injection: SAMPLE_ID_DUPLICATE",
+      "target": "10/10 needs_review with SAMPLE_ID_DUPLICATE",
+      "measured": "10/10",
+      "passed": true,
+      "note": ""
+    },
+    {
+      "id": "E3.TEST_DATE_INVALID",
+      "name": "Error injection: TEST_DATE_INVALID",
+      "target": "10/10 needs_review with TEST_DATE_INVALID",
+      "measured": "10/10",
+      "passed": true,
+      "note": ""
+    },
+    {
+      "id": "E3.FP",
+      "name": "False positives on the 283 original records",
+      "target": "0",
+      "measured": "0 of 283",
+      "passed": true,
+      "note": "LAB_NOT_IN_L10 warnings (non-blocking): 0"
+    },
+    {
+      "id": "E4a",
+      "name": "Template letters pass fact_guard",
+      "target": "283/283",
+      "measured": "283/283",
+      "passed": true,
+      "note": ""
+    },
+    {
+      "id": "E4b",
+      "name": "Injected wrong numbers / ids / lab names / villages / dates rejected",
+      "target": "45/45",
+      "measured": "45/45",
+      "passed": true,
+      "note": "9 kinds x 5 letters"
+    },
+    {
+      "id": "E5",
+      "name": "Boundary / unit tests",
+      "target": "all pass",
+      "measured": "28 passed, 0 failed",
+      "passed": true,
+      "note": ""
+    },
+    {
+      "id": "E6a",
+      "name": "Advice lines with a source id present in sources.json",
+      "target": "1788/1788",
+      "measured": "1788/1788 (verbatim from table: 1788)",
+      "passed": true,
+      "note": ""
+    },
+    {
+      "id": "E6b",
+      "name": "needs_review packets with any advice or letter",
+      "target": "0",
+      "measured": "0 of 100",
+      "passed": true,
+      "note": ""
+    },
+    {
+      "id": "E6c",
+      "name": "'boil' text in chemical packets (except nitrate H_N2)",
+      "target": "0",
+      "measured": "0",
+      "passed": true,
+      "note": "includes synthetic arsenic packet"
+    },
+    {
+      "id": "E7",
+      "name": "Public sample of 30 records for manual checking",
+      "target": "30 rows written",
+      "measured": "30 rows; statuses {'ready': 30}",
+      "passed": true,
+      "note": "sha256(sample_id) rule; eval/public_sample_30.csv"
+    }
+  ],
+  "details": {
+    "E1": {
+      "label": "reproduction, not independent accuracy",
+      "records": 283,
+      "numeric": 283,
+      "exceeds_by_our_rule": 283,
+      "by_param": {
+        "Fluoride": 224,
+        "Nitrate": 52,
+        "Ecoil": 7
+      }
+    },
+    "E2": {
+      "ready_packets": 283,
+      "candidate_labs_checked": 1415,
+      "unsuitable": 0,
+      "packets_with_same_district_candidate": 251,
+      "packets_without_same_district_candidate": 32,
+      "packets_top_lab_same_district": 251,
+      "synthetic_arsenic": {
+        "status": "ready",
+        "labs_total": 3,
+        "labs": [
+          "SUNKESULA WTP",
+          "Peddakadubur WTP",
+          "Sathanur WTP"
+        ]
+      },
+      "synthetic_zero_lab": {
+        "status": "no_candidate_lab",
+        "letter": null,
+        "note": "No lab in this state's L10 list tests this parameter. Contact the State Level laboratory.",
+        "how": "arsenic record routed against AP L10 with the 3 arsenic-capable labs removed"
+      },
+      "tie_order_unstable_packets": 0,
+      "shuffles_per_packet": 3,
+      "sample_lab_names_distinct": 17,
+      "not_in_l10_before_normalization": {
+        "names": 3,
+        "records": 19,
+        "list": [
+          "Sri Satya Sai  - District Level Water Testing Laboratory",
+          "Anakapalli  - District level Water Testing laboratory",
+          "Kakinada  - District Level Water Testing Laboratory"
+        ]
+      },
+      "not_in_l10_after_normalization": {
+        "names": 0,
+        "records": 0,
+        "list": []
+      }
+    },
+    "E3": {
+      "VALUE_MISSING": {
+        "mutated": 10,
+        "caught": 10,
+        "misses": []
+      },
+      "VALUE_NOT_NUMERIC": {
+        "mutated": 10,
+        "caught": 10,
+        "misses": []
+      },
+      "UNIT_MISSING": {
+        "mutated": 10,
+        "caught": 10,
+        "misses": []
+      },
+      "UNIT_MISMATCH": {
+        "mutated": 10,
+        "caught": 10,
+        "misses": []
+      },
+      "UNKNOWN_PARAM": {
+        "mutated": 10,
+        "caught": 10,
+        "misses": []
+      },
+      "LIMIT_MISMATCH": {
+        "mutated": 10,
+        "caught": 10,
+        "misses": []
+      },
+      "BELOW_LIMIT_BUT_LISTED": {
+        "mutated": 10,
+        "caught": 10,
+        "misses": []
+      },
+      "SAMPLE_ID_MISSING": {
+        "mutated": 10,
+        "caught": 10,
+        "misses": []
+      },
+      "SAMPLE_ID_DUPLICATE": {
+        "mutated": 10,
+        "caught": 10,
+        "misses": []
+      },
+      "TEST_DATE_INVALID": {
+        "mutated": 10,
+        "caught": 10,
+        "misses": []
+      },
+      "false_positives_on_originals": {
+        "count": 0,
+        "ids": [],
+        "lab_not_in_l10_warnings": 0
+      }
+    },
+    "E4": {
+      "ready": 283,
+      "template_letters_passed": 283,
+      "injected": 45,
+      "rejected": 45,
+      "by_kind": {
+        "wrong_value": 5,
+        "wrong_permissible": 5,
+        "wrong_ratio": 5,
+        "wrong_sample_id": 5,
+        "wrong_target_lab": 5,
+        "wrong_original_lab": 5,
+        "wrong_village": 5,
+        "wrong_date": 5,
+        "extra_number": 5
+      },
+      "misses": []
+    },
+    "E5": {
+      "command": "pytest -q tests/test_boundaries.py",
+      "passed": 28,
+      "failed": 0,
+      "summary": "28 passed in 0.02s"
+    },
+    "E6": {
+      "packets_checked": 384,
+      "advice_lines": 1788,
+      "unsourced": 0,
+      "not_verbatim": 0,
+      "needs_review_packets": 100,
+      "needs_review_with_advice_or_letter": 0,
+      "forbidden_boil_lines": 0
+    },
+    "E7": {
+      "rule": "sort records by sha256(sample_id) ascending (ties by record id), first 30",
+      "file": "eval/public_sample_30.csv",
+      "statuses": {
+        "ready": 30
+      },
+      "record_ids": [
+        "U713978S20854382-fluoride",
+        "U713978S20862069-fluoride",
+        "U709176S19712329-fluoride",
+        "U709176S19726755-fluoride",
+        "U704038S21469166-fluoride",
+        "U728079S19689918-nitrate",
+        "U709176S19562895-fluoride",
+        "U714260S24254517-fluoride",
+        "U704038S20837681-nitrate",
+        "U704038S20837491-fluoride",
+        "U704038S20837491-nitrate",
+        "U709176S19562925-fluoride",
+        "U709176S19562892-fluoride",
+        "U709176S19712242-fluoride",
+        "U709176S19544512-fluoride",
+        "U709176S19728957-fluoride",
+        "U709176S19712541-fluoride",
+        "U724008S23633020-nitrate",
+        "U1645997S23453545-nitrate",
+        "U1904307S24135877-fluoride",
+        "U723297S19539779-nitrate",
+        "U704038S20094309-fluoride",
+        "U709176S19562901-fluoride",
+        "U704740S25774352-fluoride",
+        "U704038S20094301-fluoride",
+        "U704038S24873760-fluoride",
+        "U709176S19544548-fluoride",
+        "U709176S19563033-fluoride",
+        "U709176S19563063-fluoride",
+        "U711594S23399782-nitrate"
+      ]
+    }
+  }
+}

@@ -1,0 +1,148 @@
+"""JalSetu web app: static HTML + vanilla JS over a small JSON API."""
+import json
+import os
+from collections import Counter
+from functools import lru_cache
+from pathlib import Path
+
+from fastapi import FastAPI, HTTPException
+from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
+
+from jalsetu import pinned, snapshot
+from jalsetu.pipeline import build_packet
+from jalsetu.units import parse_value
+
+ROOT = Path(__file__).resolve().parent.parent
+STATIC = Path(__file__).resolve().parent / "static"
+EVAL_LATEST = ROOT / "eval" / "results" / "latest.json"
+
+app = FastAPI(title="JalSetu")
+app.mount("/static", StaticFiles(directory=STATIC), name="static")
+
+
+@lru_cache(maxsize=1)
+def state():
+    snap = snapshot.load()
+    packets = {}
+    for r in snap.samples:
+        p = build_packet(r, snap, use_llm=False)
+        packets[p["record_id"]] = p
+    return snap, packets
+
+
+def footer(snap) -> str:
+    return (
+        f'<footer>Data snapshot: {snap.date} (WQMIS, retrieved {snap.manifest["retrieved_utc"]}). '
+        "Decision support only. A qualified officer must confirm every action. "
+        'Code: MIT License. <a href="/sources">Sources</a> · <a href="/eval">Evaluation</a></footer>'
+    )
+
+
+def page(name: str) -> HTMLResponse:
+    snap, _ = state()
+    body = (STATIC / f"{name}.html").read_text(encoding="utf-8")
+    return HTMLResponse(body.replace("{{FOOTER}}", footer(snap)).replace("{{SNAPSHOT}}", snap.date))
+
+
+@app.get("/", response_class=HTMLResponse)
+def overview_page():
+    return page("index")
+
+
+@app.get("/queue", response_class=HTMLResponse)
+def queue_page():
+    return page("queue")
+
+
+@app.get("/sample/{rid}", response_class=HTMLResponse)
+def sample_page(rid: str):
+    return page("sample")
+
+
+@app.get("/sources", response_class=HTMLResponse)
+def sources_page():
+    return page("sources")
+
+
+@app.get("/eval", response_class=HTMLResponse)
+def eval_page():
+    return page("eval")
+
+
+@app.get("/api/meta")
+def api_meta():
+    snap, _ = state()
+    return {"snapshot": snap.date, "retrieved_utc": snap.manifest["retrieved_utc"], "source_urls": snap.manifest["source_urls"]}
+
+
+@app.get("/api/overview")
+def api_overview():
+    snap, packets = state()
+    ps = list(packets.values())
+    return {
+        "caption": f"Villages with at least one contaminated sample, by parameter (a village can appear under several parameters; not a count of people). Source: WQMIS WQ6, retrieved {snap.date} 01:53 UTC.",
+        "states": snap.states,
+        "ap": {
+            "records": len(ps),
+            "by_param": Counter(p["record"]["param"] for p in ps),
+            "by_status": Counter(p["status"] for p in ps),
+            "districts": len({p["record"]["district"] for p in ps}),
+            "villages": len({p["record"]["village_id"] for p in ps}),
+            "l10_labs": len(snap.labs),
+        },
+    }
+
+
+def _row(p: dict) -> dict:
+    r, v = p["record"], p["verdict"] or {}
+    pv = parse_value(r.get("value"))
+    return {
+        "record_id": p["record_id"],
+        "sample_id": p["sample_id"],
+        "village": r.get("village"),
+        "district": r.get("district"),
+        "param": v.get("param_display") or r.get("param"),
+        "value": pv["number"],
+        "unit": v.get("unit") or pv["unit_raw"],
+        "permissible": v.get("permissible"),
+        "ratio": v.get("ratio"),
+        "tested": r.get("tested"),
+        "status": p["status"],
+    }
+
+
+@app.get("/api/samples")
+def api_samples():
+    _, packets = state()
+    rows = [_row(p) for p in packets.values()]
+    rows.sort(key=lambda x: (x["ratio"] is None, -(x["ratio"] or 0), x["record_id"]))
+    return rows
+
+
+@app.get("/api/packet/{rid}")
+def api_packet(rid: str):
+    snap, packets = state()
+    if rid not in packets:
+        matches = [k for k, p in packets.items() if p["sample_id"] == rid]
+        if not matches:
+            raise HTTPException(404, f"no record {rid!r} in snapshot {snap.date}")
+        if len(matches) > 1:
+            return JSONResponse(status_code=409, content={"detail": "sample id is listed under several parameters; choose one", "record_ids": matches})
+        rid = matches[0]
+    p = packets[rid]
+    if os.environ.get("GEMINI_API_KEY") and p["status"] == "ready":
+        p = build_packet(p["record"], snap, use_llm=True)
+    return p
+
+
+@app.get("/api/sources")
+def api_sources():
+    return {"sources": list(pinned.sources().values()), "limits": pinned.limits(), "lines": pinned.table()["lines"], "mapping": pinned.mapping()}
+
+
+@app.get("/api/eval/latest")
+def api_eval_latest():
+    if not EVAL_LATEST.exists():
+        raise HTTPException(404, "no evaluation results yet; run `make eval`")
+    return json.loads(EVAL_LATEST.read_text(encoding="utf-8"))

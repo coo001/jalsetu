@@ -1,0 +1,73 @@
+{
+  "pinned_on": "2026-11-09",
+  "limits": {
+    "fluoride": {
+      "display": "Fluoride",
+      "names": ["Fluoride"],
+      "unit": "mg/l",
+      "acceptable": 1.0,
+      "permissible": 1.5,
+      "permissible_note": null,
+      "kind": "chemical",
+      "source_ids": ["BIS-10500", "WHO-GDWQ"],
+      "ref": "BIS-10500 Table 2 (x); WHO-GDWQ GV 1.5 mg/l"
+    },
+    "nitrate": {
+      "display": "Nitrate",
+      "names": ["Nitrate"],
+      "unit": "mg/l",
+      "acceptable": 45,
+      "permissible": 45,
+      "permissible_note": "No relaxation",
+      "kind": "chemical",
+      "source_ids": ["BIS-10500", "WHO-GDWQ"],
+      "ref": "BIS-10500 Table 2 (xvi); WHO-GDWQ GV 50 mg/l as nitrate (bottle-fed infants)"
+    },
+    "arsenic": {
+      "display": "Arsenic",
+      "names": ["Total arsenic", "Arsenic"],
+      "unit": "mg/l",
+      "acceptable": 0.01,
+      "permissible": 0.01,
+      "permissible_note": "decision value; BIS 2012 table prints 0.05, PIB-2022 extract says No relaxation; amendment text not seen",
+      "kind": "chemical",
+      "source_ids": ["BIS-10500", "PIB-2022", "WHO-GDWQ"],
+      "ref": "BIS-10500 Table 3 (x); PIB-2022; WHO-GDWQ provisional GV 0.01"
+    },
+    "ecoli": {
+      "display": "E. coli",
+      "names": ["Ecoil", "E. coli"],
+      "unit": "CFU/100 ml",
+      "acceptable": 0,
+      "acceptable_note": "not detectable in any 100 ml",
+      "permissible": 0,
+      "permissible_note": null,
+      "kind": "bacteriological",
+      "source_ids": ["BIS-10500", "WHO-GDWQ"],
+      "ref": "BIS-10500 Table 6; WHO-GDWQ Table 7.10"
+    }
+  },
+  "exceeds_rule": "chemical exceeds if value > permissible; ecoli exceeds if value > 0. ratio = value/permissible (ecoli: show count, ratio null).",
+  "lines": [
+    {"id": "CHEM_1", "kind": "officer", "text": "Stop use of this source for drinking and cooking now: close a contaminated PWS source; if it is a non-PWS source (e.g. hand pump), discontinue it and paint it RED.", "source_ids": ["JJM-HB"], "ref": "JJM-HB 2.6 Remedial Action"},
+    {"id": "CHEM_2", "kind": "officer", "text": "Within 24 hours, supply safe drinking water (at least 8–10 litres per person per day) from a safe source or by tanker until safe supply is restored.", "source_ids": ["JJM-HB"], "ref": "JJM-HB 2.6"},
+    {"id": "CHEM_3", "kind": "officer", "text": "Re-test all basic and area-specific chemical parameters and bacteriological parameters; restore supply only from a source found safe.", "source_ids": ["JJM-HB"], "ref": "JJM-HB 2.6"},
+    {"id": "CHEM_4", "kind": "officer", "text": "Notify the result to the relevant authorities (Executive Engineer PHED/RWS, district health officer) and to the affected community.", "source_ids": ["JJM-HB", "JJM-FW"], "ref": "JJM-HB 2.6; JJM-FW 9.1 Data sharing and remedial action"},
+    {"id": "F_1", "kind": "officer", "text": "Fluoride above 1.5 mg/l carries an increasing risk of dental fluorosis; much higher concentrations lead to skeletal fluorosis.", "source_ids": ["WHO-GDWQ"], "ref": "WHO-GDWQ ch.12 Fluoride"},
+    {"id": "N_1", "kind": "officer", "text": "Prioritise safe water for bottle-fed infants: the nitrate guideline protects this most sensitive group, and risk is higher for infants with gastrointestinal infection (diarrhoea).", "source_ids": ["WHO-GDWQ"], "ref": "WHO-GDWQ ch.12 Nitrate and nitrite"},
+    {"id": "AS_1", "kind": "officer", "text": "Substitute with a low-arsenic, microbiologically safe source; mark high-arsenic sources (e.g. paint hand pumps a different colour).", "source_ids": ["WHO-AS"], "ref": "WHO-AS Prevention and control"},
+    {"id": "EC_1", "kind": "officer", "text": "Within 24 hours: proper disinfection, inform the authority and affected community, and arrange temporary safe drinking water by tanker (8–10 litres per person per day).", "source_ids": ["JJM-HB"], "ref": "JJM-HB 2.6"},
+    {"id": "EC_2", "kind": "officer", "text": "Take immediate investigative action to find the cause.", "source_ids": ["BIS-10500"], "ref": "BIS-10500 Table 6 note 1"},
+    {"id": "H_CHEM", "kind": "household", "text": "Do not drink or cook with water from this source until the re-test result says it is safe. Safe drinking water will be arranged by the water department.", "source_ids": ["JJM-HB"], "ref": "JJM-HB 2.6"},
+    {"id": "H_N1", "kind": "household", "text": "Do not use this water to prepare infant formula.", "source_ids": ["WHO-GDWQ"], "ref": "WHO-GDWQ ch.12 Nitrate and nitrite"},
+    {"id": "H_N2", "kind": "household", "text": "Boiling for a long time makes nitrate more concentrated. If you boil water, stop as soon as it reaches a rolling boil.", "source_ids": ["WHO-GDWQ"], "ref": "WHO-GDWQ ch.12 Nitrate and nitrite"},
+    {"id": "H_AS", "kind": "household", "text": "Water high in arsenic can still be used for bathing and washing clothes, but not for drinking or cooking.", "source_ids": ["WHO-AS"], "ref": "WHO-AS Prevention and control"},
+    {"id": "H_EC", "kind": "household", "text": "Until re-tested, bring drinking water to a rolling boil before use. Let it cool naturally without adding ice, and keep it covered so it is not contaminated again.", "source_ids": ["WHO-BOIL"], "ref": "WHO-BOIL Conclusions"}
+  ],
+  "mapping": {
+    "fluoride": ["CHEM_1", "CHEM_2", "CHEM_3", "CHEM_4", "F_1", "H_CHEM"],
+    "nitrate": ["CHEM_1", "CHEM_2", "CHEM_3", "CHEM_4", "N_1", "H_CHEM", "H_N1", "H_N2"],
+    "arsenic": ["CHEM_1", "CHEM_2", "CHEM_3", "CHEM_4", "AS_1", "H_CHEM", "H_AS"],
+    "ecoli": ["EC_1", "EC_2", "H_EC"]
+  }
+}

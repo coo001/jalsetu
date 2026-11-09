@@ -1,0 +1,54 @@
+{
+  "pinned_on": "2026-11-09",
+  "sources": [
+    {
+      "id": "BIS-10500",
+      "title": "IS 10500:2012 Drinking Water — Specification (Second Revision), BIS, May 2012",
+      "url": "https://cpcb.nic.in/wqm/BIS_Drinking_Water_Specification.pdf",
+      "extra_urls": [
+        {
+          "label": "amendment copy",
+          "url": "https://www.consumerhelpline.gov.in/bis/IS10500-2012.pdf",
+          "note": "Amendment No. 2, Sep 2018; does not change F, NO3, As, E. coli rows"
+        }
+      ],
+      "sha256_16": "9b8999c29ce264aa"
+    },
+    {
+      "id": "WHO-GDWQ",
+      "title": "WHO Guidelines for drinking-water quality, 4th ed. incorporating the 1st and 2nd addenda, 2022 (ISBN 9789240045064)",
+      "url": "https://www.who.int/publications/i/item/9789240045064",
+      "sha256_16": "a0ac96fa5eac13e4"
+    },
+    {
+      "id": "WHO-BOIL",
+      "title": "WHO Technical brief: Boil water, WHO/FWC/WSH/15.02, 2015",
+      "url": "https://www.who.int/publications/i/item/WHO-FWC-WSH-15.02",
+      "sha256_16": "136d2e2bc676c981"
+    },
+    {
+      "id": "WHO-AS",
+      "title": "WHO fact sheet: Arsenic (web page, accessed 2026-11-09)",
+      "url": "https://www.who.int/news-room/fact-sheets/detail/arsenic",
+      "sha256_16": null
+    },
+    {
+      "id": "JJM-HB",
+      "title": "Concise Handbook for Monitoring Water Quality of Piped Drinking Water Supply to Rural Households, DDWS / National Jal Jeevan Mission (no edition printed; content refers to 2024)",
+      "url": "https://jaljeevanmission.gov.in/sites/default/files/Handbook-water-quality-en.pdf",
+      "sha256_16": "19da7f395364ee6d"
+    },
+    {
+      "id": "JJM-FW",
+      "title": "Drinking Water Quality Monitoring & Surveillance Framework, National Jal Jeevan Mission (no edition printed; latest date in text Oct 2022)",
+      "url": "https://jaljeevanmission.gov.in/sites/default/files/guideline/WQMS-Framework.pdf",
+      "sha256_16": "27356d402f6a3ae4"
+    },
+    {
+      "id": "PIB-2022",
+      "title": "PIB, Ministry of Jal Shakti, 'Monitoring of Contamination of Ground Water', 21 Jul 2022 (BIS extract lists Total Arsenic permissible 'No relaxation')",
+      "url": "https://www.pib.gov.in/PressReleasePage.aspx?PRID=1843385",
+      "sha256_16": null
+    }
+  ]
+}

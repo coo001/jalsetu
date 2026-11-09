@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Queue · JalSetu</title><link rel="stylesheet" href="/static/style.css"></head>
+<body data-page="queue">
+<header><a class="brand" href="/">JalSetu</a><nav><a href="/">Overview</a><a href="/queue">Queue</a><a href="/sources">Sources</a><a href="/eval">Evaluation</a></nav></header>
+<main>
+<h1>Andhra Pradesh sample queue</h1>
+<div class="filters"><label>Status <select id="f-status"><option value="">all</option><option>ready</option><option>needs_review</option><option>no_candidate_lab</option></select></label>
+<label>Parameter <select id="f-param"><option value="">all</option></select></label> <span id="count"></span></div>
+<p id="status" class="status">Loading samples…</p>
+<div class="scroll"><table id="queue"><thead><tr>
+<th data-k="sample_id">Sample ID</th><th data-k="village">Village</th><th data-k="district">District</th><th data-k="param">Parameter</th>
+<th data-k="value">Value / limit</th><th data-k="ratio">Ratio ▼</th><th data-k="tested_sort">Test date</th><th data-k="status">Status</th></tr></thead><tbody></tbody></table></div>
+</main>
+{{FOOTER}}
+<script src="/static/app.js"></script>
+</body></html>

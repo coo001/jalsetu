@@ -1,0 +1,30 @@
+{
+ "retrieved_utc": "2026-11-09T01:53:38.858214Z",
+ "wq6_states_2024-2025": {
+  "states": 34,
+  "villages_arsenic": 605,
+  "villages_fluoride": 3430,
+  "villages_nitrate": 7443,
+  "villages_ecoli": 3739
+ },
+ "wq6_states_2025-2026": {
+  "states": 34,
+  "villages_arsenic": 282,
+  "villages_fluoride": 2217,
+  "villages_nitrate": 5701,
+  "villages_ecoli": 4640
+ },
+ "AP_2024-25_Fluoride_villages": 42,
+ "AP_2024-25_Nitrate_villages": 19,
+ "AP_2024-25_Total arsenic_villages": 0,
+ "AP_2024-25_Ecoil_villages": 3,
+ "AP_samples": 283,
+ "AP_sample_seconds": 134.2,
+ "AP_labs": 138,
+ "AP_labs_can_test": {
+  "Fluoride": 122,
+  "Nitrate": 119,
+  "Arsenic": 3,
+  "E. coli": 114
+ }
+}
