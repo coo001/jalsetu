@@ -29,10 +29,10 @@
       "unit": "mg/l",
       "acceptable": 0.01,
       "permissible": 0.01,
-      "permissible_note": "decision value; BIS 2012 table prints 0.05, PIB-2022 extract says No relaxation; amendment text not seen",
+      "permissible_note": "No relaxation (IS 10500:2012 Amendment No.1, 2015)",
       "kind": "chemical",
-      "source_ids": ["BIS-10500", "PIB-2022", "WHO-GDWQ"],
-      "ref": "BIS-10500 Table 3 (x); PIB-2022; WHO-GDWQ provisional GV 0.01"
+      "source_ids": ["BIS-10500", "WHO-GDWQ"],
+      "ref": "BIS-10500 Table 3 (x) as amended (Amend. No.1, 2015); WHO-GDWQ provisional GV 0.01"
     },
     "ecoli": {
       "display": "E. coli",

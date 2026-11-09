@@ -5,10 +5,13 @@ from collections import Counter
 from functools import lru_cache
 from pathlib import Path
 
-from fastapi import FastAPI, HTTPException
+from contextlib import asynccontextmanager
+
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
+from app import usage
 from jalsetu import pinned, snapshot
 from jalsetu.pipeline import build_packet
 from jalsetu.units import parse_value
@@ -17,7 +20,15 @@ ROOT = Path(__file__).resolve().parent.parent
 STATIC = Path(__file__).resolve().parent / "static"
 EVAL_LATEST = ROOT / "eval" / "results" / "latest.json"
 
-app = FastAPI(title="JalSetu")
+
+@asynccontextmanager
+async def lifespan(_app):
+    yield
+    if usage.enabled():
+        usage.log_snapshot()
+
+
+app = FastAPI(title="JalSetu", lifespan=lifespan)
 app.mount("/static", StaticFiles(directory=STATIC), name="static")
 
 
@@ -29,6 +40,19 @@ def state():
         p = build_packet(r, snap, use_llm=False)
         packets[p["record_id"]] = p
     return snap, packets
+
+
+def count(request: Request, template: str) -> bool:
+    """Count one hit on a fixed route template; nothing from the request is stored."""
+    if usage.should_count(request.url.path, request.headers.get("user-agent")):
+        usage.record(template)
+        return True
+    return False
+
+
+@app.get("/healthz")
+def healthz():
+    return {"ok": True}
 
 
 def footer(snap) -> str:
@@ -46,27 +70,32 @@ def page(name: str) -> HTMLResponse:
 
 
 @app.get("/", response_class=HTMLResponse)
-def overview_page():
+def overview_page(request: Request):
+    count(request, "/")
     return page("index")
 
 
 @app.get("/queue", response_class=HTMLResponse)
-def queue_page():
+def queue_page(request: Request):
+    count(request, "/queue")
     return page("queue")
 
 
 @app.get("/sample/{rid}", response_class=HTMLResponse)
-def sample_page(rid: str):
+def sample_page(rid: str, request: Request):
+    count(request, "/sample/{id}")
     return page("sample")
 
 
 @app.get("/sources", response_class=HTMLResponse)
-def sources_page():
+def sources_page(request: Request):
+    count(request, "/sources")
     return page("sources")
 
 
 @app.get("/eval", response_class=HTMLResponse)
-def eval_page():
+def eval_page(request: Request):
+    count(request, "/eval")
     return page("eval")
 
 
@@ -121,8 +150,9 @@ def api_samples():
 
 
 @app.get("/api/packet/{rid}")
-def api_packet(rid: str):
+def api_packet(rid: str, request: Request):
     snap, packets = state()
+    counted = count(request, "/api/packet/{id}")
     if rid not in packets:
         matches = [k for k, p in packets.items() if p["sample_id"] == rid]
         if not matches:
@@ -133,7 +163,19 @@ def api_packet(rid: str):
     p = packets[rid]
     if os.environ.get("GEMINI_API_KEY") and p["status"] == "ready":
         p = build_packet(p["record"], snap, use_llm=True)
+    if counted:
+        usage.record(f"status:{p['status']}")
     return p
+
+
+@app.post("/api/usage/print", status_code=204)
+def api_usage_print(request: Request):
+    count(request, "print")
+
+
+@app.get("/api/stats")
+def api_stats():
+    return usage.stats()
 
 
 @app.get("/api/sources")

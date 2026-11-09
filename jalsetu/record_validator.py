@@ -79,7 +79,9 @@ def validate(record: dict, key_counts: Counter, lab_names: set[str], snapshot_da
         if acc != float(lim["acceptable"]) or perm != float(lim["permissible"]):
             add(
                 "LIMIT_MISMATCH",
-                f"record limits {record.get('acceptable')!r}/{record.get('permissible')!r} != pinned {lim['acceptable']}/{lim['permissible']}",
+                f"record limits {record.get('acceptable')!r}/{record.get('permissible')!r} != pinned {lim['acceptable']}/{lim['permissible']}"
+                + (" (arsenic permissible is 'No relaxation' = 0.01 since IS 10500:2012 Amendment No.1, 2015; 0.05 is the unamended 2012 value)"
+                   if pk == "arsenic" and perm != float(lim["permissible"]) else ""),
             )
         if pv["number"] is not None:
             p = float(lim["permissible"])

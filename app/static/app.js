@@ -65,7 +65,7 @@ async function queue() {
 function rawRecord(r) { return `<table class="raw">${Object.entries(r).map(([k, v]) => `<tr><th>${esc(k)}</th><td>${esc(v)}</td></tr>`).join("")}</table>`; }
 
 async function sample() {
-  $("#print").addEventListener("click", () => window.print());
+  $("#print").addEventListener("click", () => { fetch("/api/usage/print", { method: "POST" }).catch(() => {}); window.print(); });
   const rid = decodeURIComponent(location.pathname.split("/").pop());
   let p;
   try { p = await getJSON(`/api/packet/${encodeURIComponent(rid)}`, "Loading packet…"); }
@@ -101,7 +101,7 @@ async function sample() {
 
 async function sources() {
   const d = await getJSON("/api/sources", "Loading sources…");
-  table($("#src"), [["id", "ID"], ["title", "Edition / title"], ["url", "URL", (s) => `<a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.url)}</a>${(s.extra_urls || []).map((x) => `<br><a href="${esc(x.url)}">${esc(x.label)}</a> (${esc(x.note)})`).join("")}`], ["sha256_16", "sha256 (first 16)", (s) => `<code>${esc(s.sha256_16 || "web page, not hashed")}</code>`]], d.sources);
+  table($("#src"), [["id", "ID"], ["title", "Edition / title"], ["url", "URL", (s) => `<a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.url)}</a>${(s.extra_urls || []).map((x) => `<br><a href="${esc(x.url)}">${esc(x.label)}</a> (${esc(x.note)})`).join("")}${s.consolidated_copy ? `<br><a href="${esc(s.consolidated_copy.url)}">consolidated copy</a>: ${esc(s.consolidated_copy.title)} (sha256 <code>${esc(s.consolidated_copy.sha256_16)}</code>; ${esc(s.consolidated_copy.note)})` : ""}${s.amendment_1 ? `<br>Amendment No.1 (${esc(s.amendment_1.date)}): “${esc(s.amendment_1.text)}” (<a href="${esc(s.amendment_1.scan_url)}">scan</a>; ${esc(s.amendment_1.note)})` : ""}`], ["sha256_16", "sha256 (first 16)", (s) => `<code>${esc(s.sha256_16 || "web page, not hashed")}</code>`]], d.sources);
   table($("#lim"), [["display", "Parameter"], ["names", "Names in data", (l) => esc(l.names.join(", "))], ["unit", "Unit"], ["acceptable", "Acceptable"], ["permissible", "Permissible", (l) => esc(l.permissible) + (l.permissible_note ? ` (${esc(l.permissible_note)})` : "")], ["ref", "Ref"]], Object.values(d.limits));
   table($("#lines"), [["id", "ID"], ["kind", "Kind"], ["text", "Text"], ["source_ids", "Sources", (l) => esc(l.source_ids.join(", "))], ["ref", "Ref"], ["id", "Used for", (l) => esc(Object.entries(d.mapping).filter(([, ids]) => ids.includes(l.id)).map(([k]) => k).join(", "))]], d.lines);
 }
@@ -114,6 +114,17 @@ async function evaluation() {
   table($("#ev"), [["id", "ID"], ["name", "Check"], ["target", "Target"], ["measured", "Measured"], ["passed", "Met target", (r) => (r.passed ? "yes" : "<b>no</b>")], ["note", "Note"]], d.summary);
 }
 
-const pages = { overview, queue, sample, sources, eval: evaluation };
+async function counters() {
+  const el = $("#usage");
+  if (!el) return;
+  try {
+    const u = await (await fetch("/api/stats")).json();
+    const rows = Object.entries(u.counters || {}).flatMap(([day, c]) => Object.entries(c).map(([k, n]) => ({ day, k, n })));
+    el.innerHTML = `<p class="notice">${esc(u.note)}</p><p class="muted">Since ${esc(u.since_utc)} (UTC)${u.enabled ? "" : " · counting disabled"}</p>` +
+      (rows.length ? `<table>${["<tr><th>Date (UTC)</th><th>Counter</th><th>Count</th></tr>", ...rows.map((r) => `<tr><td>${esc(r.day)}</td><td>${esc(r.k)}</td><td>${esc(r.n)}</td></tr>`)].join("")}</table>` : "<p class='muted'>No counted events yet.</p>");
+  } catch (e) { el.textContent = `Could not load counters: ${e.message}`; }
+}
+
+const pages = { overview, queue, sample, sources, eval: () => Promise.all([evaluation(), counters()]) };
 const fn = pages[document.body.dataset.page];
 if (fn) fn().catch(fail);

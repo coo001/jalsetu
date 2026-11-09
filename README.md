@@ -61,7 +61,7 @@ snapshot, retries with exponential backoff and a timeout, and appends failures t
 
 | ID | Edition | sha256 (first 16) |
 |---|---|---|
-| BIS-10500 | IS 10500:2012 Drinking Water — Specification (Second Revision), BIS, May 2012 ([pdf](https://cpcb.nic.in/wqm/BIS_Drinking_Water_Specification.pdf); [amendment copy](https://www.consumerhelpline.gov.in/bis/IS10500-2012.pdf), Amendment No. 2, Sep 2018, does not change F, NO3, As, E. coli rows) | 9b8999c29ce264aa |
+| BIS-10500 | IS 10500:2012 Drinking Water — Specification (Second Revision), BIS, May 2012 ([pdf](https://cpcb.nic.in/wqm/BIS_Drinking_Water_Specification.pdf); [amendment copy](https://www.consumerhelpline.gov.in/bis/IS10500-2012.pdf), Amendment No. 2, Sep 2018, does not change F, NO3, As, E. coli rows; [consolidated copy incl. Amendments 1–4](https://www.civilapps.in/files/Codes/Materials/General/IS-10500-2012-2023-Water%20Quality.pdf), third-party host of BIS file, sha256_16 `54348d5f9036b6d1`) | 9b8999c29ce264aa |
 | WHO-GDWQ | WHO Guidelines for drinking-water quality, 4th ed. incl. 1st and 2nd addenda, 2022 (ISBN 9789240045064) | a0ac96fa5eac13e4 |
 | WHO-BOIL | WHO Technical brief: Boil water, WHO/FWC/WSH/15.02, 2015 | 136d2e2bc676c981 |
 | WHO-AS | WHO fact sheet: Arsenic (web page, accessed 2026-11-09) | web page |
@@ -69,8 +69,8 @@ snapshot, retries with exponential backoff and a timeout, and appends failures t
 | JJM-FW | Drinking Water Quality Monitoring & Surveillance Framework, NJJM (no edition printed; latest date in text Oct 2022) | 27356d402f6a3ae4 |
 | PIB-2022 | PIB, Ministry of Jal Shakti, "Monitoring of Contamination of Ground Water", 21 Jul 2022 | web page |
 
-Limits: fluoride 1.0/1.5 mg/l; nitrate 45/45 mg/l (no relaxation); arsenic 0.01/0.01 mg/l (decision value, see
-limitations); E. coli 0 CFU/100 ml. Chemical exceeds if value > permissible; E. coli exceeds if count > 0.
+Limits: fluoride 1.0/1.5 mg/l; nitrate 45/45 mg/l (no relaxation); arsenic 0.01 mg/l / No relaxation (IS 10500:2012
+Amendment No.1, 2015); E. coli 0 CFU/100 ml. Chemical exceeds if value > permissible; E. coli exceeds if count > 0.
 
 ## Evaluation (measured, run 2026-11-09, `make eval`)
 
@@ -129,9 +129,17 @@ Notes on what these numbers mean:
   accreditation, cost, transport and turnaround are not checked (stated on every packet).
 - **WQ2 remedial-action records are not collectable** from the public pages, so the tool cannot see whether any
   action was already taken.
-- **Arsenic amendment text not seen.** The BIS 2012 table prints 0.05 mg/l permissible; PIB-2022 quotes BIS as
-  "No relaxation"; 0.01 mg/l is used as the decision value. There are no arsenic records in the AP 2024-25
-  snapshot; arsenic paths are tested with synthetic records only.
+- **Arsenic amendment verified from third-party copies.** The original 2012 table prints 0.05 mg/l permissible;
+  Amendment No.1 (June 2015) substitutes "No relaxation" for 0.05 in Table 3 (x), so 0.01 mg/l is the permissible
+  limit. Verified 2026-11-09 in a consolidated BIS copy "Incorporating Amendments 1 (2015), 2 (2018), 3&4(2021)"
+  (third-party host, sha256_16 `54348d5f9036b6d1`; F, NO3 and E. coli rows unchanged) and in a scan of the
+  Amendment No.1 sheet inside third-party course slides (OCR). The official BIS portal lists the amendment file as
+  not available. Records still carrying 0.05 go to `needs_review` (LIMIT_MISMATCH). There are no arsenic records in
+  the AP 2024-25 snapshot; arsenic paths are tested with synthetic records only.
+- **Deployment counters are not impact.** `/api/stats` and the Evaluation page show anonymous in-memory page
+  counters since the last restart (bots and `/healthz` excluded, no IP/UA/cookies/query/sample ids stored; snapshot
+  logged to stdout every 50 events and on shutdown; `JALSETU_DISABLE_USAGE=1` turns it off). Not users, not
+  outcomes, not impact.
 - **JJM documents have no printed edition**; they are pinned by URL and sha256 prefix.
 - Only Andhra Pradesh FY 2024-25 sample-level data is loaded.
 - Advice is in English only.

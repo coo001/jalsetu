@@ -1,3 +1,4 @@
+import json
 import pytest
 
 from jalsetu.record_validator import validate
@@ -49,7 +50,9 @@ def test_same_sample_two_params_is_not_duplicate(snap):
 
 def test_arsenic_record_must_use_001(rec, snap):
     rec.update(param="Total arsenic", acceptable="0.01", permissible="0.05", value="0.030 (mg/l)")
-    assert codes(run(rec, snap)) == {"LIMIT_MISMATCH"}
+    res = run(rec, snap)
+    assert codes(res) == {"LIMIT_MISMATCH"}
+    assert "Amendment No.1, 2015" in res["reasons"][0]["detail"]
     rec["permissible"] = "0.01"
     assert codes(run(rec, snap)) == set()
 
@@ -70,3 +73,23 @@ def test_lab_whitespace_normalized(snap):
     r = next(r for r in snap.samples if "  " in r["lab"])
     m = run(r, snap)["lab_match"]
     assert m["verbatim_match"] is False and m["normalized_match"] is True
+
+
+def test_arsenic_unamended_005_goes_to_review(rec, snap):
+    from jalsetu.pipeline import build_packet
+    rec.update(param="Total arsenic", acceptable="0.01", permissible="0.05", value="0.030 (mg/l)")
+    p = build_packet(rec, snap, use_llm=False)
+    assert p["status"] == "needs_review" and [r["code"] for r in p["reasons"]] == ["LIMIT_MISMATCH"]
+    rec["permissible"] = "0.01"
+    assert build_packet(rec, snap, use_llm=False)["status"] == "ready"
+
+
+def test_sources_record_arsenic_amendment():
+    from jalsetu import pinned
+    b = pinned.sources()["BIS-10500"]
+    assert b["consolidated_copy"]["sha256_16"] == "54348d5f9036b6d1"
+    assert "No relaxation" in b["amendment_1"]["text"] and "0.05" in b["amendment_1"]["text"]
+    lim = pinned.limits()["arsenic"]
+    assert lim["permissible"] == 0.01 and lim["permissible_note"] == "No relaxation (IS 10500:2012 Amendment No.1, 2015)"
+    assert lim["ref"] == "BIS-10500 Table 3 (x) as amended (Amend. No.1, 2015); WHO-GDWQ provisional GV 0.01"
+    assert "not seen" not in json.dumps(b) + json.dumps(lim)
