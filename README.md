@@ -25,22 +25,35 @@ No field users or remediation outcomes yet (solo builder, no local partner). The
 python -m venv .venv && .venv/bin/pip install -r requirements.txt && .venv/bin/uvicorn app.main:app
 # or
 make test   # pytest
-make eval   # writes eval/results/<date>.json and latest.json, eval/public_sample_30.csv
+make eval   # writes eval/results/<date>.json and latest.json, eval/public_sample_30.csv, eval/public_sample_30_BR.csv
 make run    # uvicorn on port 8080
 docker build -t jalsetu . && docker run -p 8080:8080 jalsetu
 ```
 
-Pages: `/` overview, `/queue` AP sample queue, `/sample/{record_id}` packet (printable), `/sources`, `/eval`.
+Pages: `/` overview (per-state counts), `/queue` sample queue (state filter, default All), `/sample/{record_id}` packet (printable), `/sources`, `/eval`.
 JSON: `/api/samples`, `/api/packet/{sample_id or record_id}`, `/api/eval/latest`, `/api/sources`, `/api/overview`.
 
 Optional: set `GEMINI_API_KEY` to let `gemini-2.0-flash` reword the letter on the sample page. The reworded
 letter is used only if `fact_guard` passes; any error, timeout or guard failure falls back to the template.
 Tests never call the network.
 
+## Deploy (Render free)
+
+`render.yaml` is a Render Blueprint: one free web service `jalsetu` (Docker, region singapore, health check `/healthz`,
+auto-deploy on push). No paid resources.
+
+1. Push this repo to GitHub.
+2. In Render: **New → Blueprint**, select the repo; Render reads `render.yaml`.
+3. Optionally enter `GEMINI_API_KEY` when prompted (`sync: false`, so it is never stored in the repo). Leave it empty to
+   use the template letter only.
+4. Open `https://<service>.onrender.com/healthz` and expect `{"ok": true}`. Free instances sleep when idle; the first
+   request after sleep is slow.
+
 ## Data provenance
 
-Snapshot `data/snapshots/2026-11-09/`, retrieved `2026-11-09T01:53:38Z` from public WQMIS pages.
-`manifest.json` records the sha256 and row count of every file; the app and `make eval` refuse to run if a
+Snapshot `data/snapshots/2026-11-09/` from public WQMIS pages. Andhra Pradesh files were retrieved
+`2026-11-09T01:53:38Z`; Bihar arsenic files `2026-11-09T06:35:29Z` (per-file `retrieved_utc` in the manifest).
+`manifest.json` records the sha256, row count and retrieval time of every file; the app and `make eval` refuse to run if a
 hash differs (`jalsetu/snapshot.py`, tested in `tests/test_snapshot.py`).
 
 | File | Rows | Source |
@@ -48,8 +61,12 @@ hash differs (`jalsetu/snapshot.py`, tested in `tests/test_snapshot.py`).
 | `wq6_AP_2024-2025_samples.csv` | 283 | WQ6 contaminant-wise report, Andhra Pradesh, FY 2024-25 (Fluoride 224, Nitrate 52, E. coli 7; Total arsenic 0) — https://ejalshakti.gov.in/WQMIS/Report/Contaminantwise |
 | `wq6_states_2024-2025.csv`, `wq6_states_2025-2026.csv` | 34 each | WQ6 state summary (villages with ≥1 contaminated sample, by parameter) |
 | `wq_labs_AP_L10.csv` | 138 | L10 lab/parameter list, AP — https://ejalshakti.gov.in/WQMIS/Main/lab_parameterlist |
-| `wq_labs_BR_L10.csv` | 123 | L10 lab/parameter list, Bihar (kept for token tests; not routed) |
-| `probe_log.json` | – | collection log |
+| `wq6_BR_2024-2025_arsenic_samples.csv` | 592 | WQ6 contaminant-wise report, Bihar (WQMIS state id 5), FY 2024-25, Total arsenic only; 178 villages in Bhagalpur 332, Begusarai 183, Khagaria 77 records. Collected by `collector/legacy/collect_br_arsenic.py` |
+| `wq_labs_BR_L10.csv` | 123 | L10 lab/parameter list, Bihar (routes the BR records) |
+| `probe_log.json`, `br_arsenic_log.json` | – | collection logs (BR: 178 villages, 0 failed, 626.6 s) |
+
+Each record carries `state` (AP / BR) from its file, and is routed only to that state's L10 labs. Record ids stay
+`<sample_id>-<param>`; AP and BR sample ids do not overlap (checked in `tests/test_snapshot.py`).
 
 Collector: `python -m collector.wqmis --date YYYY-MM-DD` (`collector/wqmis.py`, refactored from
 `collector/legacy/`). It writes a new dated snapshot directory plus manifest, refuses to overwrite an existing
@@ -95,11 +112,33 @@ Full output: `eval/results/2026-11-09.json`. Reproducibility and safety checks o
 | E6c | "boil" text in chemical packets (except nitrate H_N2) | 0 | 0 |
 | E7 | Public sample: first 30 records by sha256(sample_id) | 30 rows | 30 rows, all ready (`eval/public_sample_30.csv`) |
 
+Bihar, 592 real Total arsenic records (same checks, keys with suffix `_BR`):
+
+| ID | Check | Target | Measured |
+|---|---|---|---|
+| E1_BR | Government verdict reproduction (reproduction, not independent accuracy) | all numeric records exceed | 592/592 |
+| E2a_BR | Candidate lab slots whose BR L10 list lacks arsenic | 0 | 0 of 2,960 |
+| E2b_BR | Ready packets with a same-district candidate | report | 592 with / 0 without |
+| E2e_BR | Lab order stable under input shuffles (3 per packet) | 0 unstable | 0 / 592 |
+| E2f_BR | Sample lab names not in BR L10 | report | 0/6 names |
+| E3.FP_BR | False positives on the 592 original records | 0 | 0 |
+| E4a_BR | Template letters passing fact_guard | 592/592 | 592/592 |
+| E6a_BR | Advice lines with an existing source id (and verbatim from table) | 4,144/4,144 | 4,144/4,144 |
+| E6b_BR / E6c_BR | needs_review with advice / "boil" in arsenic packets | 0 / 0 | 0 of 0 / 0 |
+| VALUE_EXTREME_BR | Records with value ≥ 100 × permissible (warning only) | report | 2 (228.000 and 1.880 mg/l) |
+| E7_BR | Public sample: first 30 BR records by sha256(sample_id) | 30 rows | 30 rows, all ready (`eval/public_sample_30_BR.csv`) |
+
 Notes on what these numbers mean:
 - E1 only shows the code agrees with the government listing; every record in the input was already listed as
   contaminated, so it is not an accuracy measure.
 - E3/E4 mutations are written by the same author as the validator and guard, so they test known failure modes,
   not unknown ones.
+- All 123 labs in the Bihar L10 list report arsenic testing, so E2a_BR/E2b_BR are easy targets; they show the routing
+  uses the BR list, not that Bihar lab capacity was checked.
+- VALUE_EXTREME: a chemical value ≥ 100 × permissible adds a warning (it does not stop the packet; the verdict still
+  says it exceeds). The UI shows "Very high value: check the unit entry with the testing lab. Ratio not verified." next
+  to the ratio, and the letter adds "Please confirm the reported value and unit." (fact_guard requires that line when the
+  warning is present). The 228.000 mg/l record is almost certainly a unit entry error.
 - E2b: 32 packets (districts ALLURI SITHARAMA RAJU, SRI SATHYA SAI, Y.S.R.) have no lab whose name or address
   contains the WQMIS district spelling (e.g. L10 spells "Sri Satya Sai", WQ6 spells "SRI SATHYA SAI"); no fuzzy
   matching is done.
@@ -113,8 +152,10 @@ Notes on what these numbers mean:
 - `no_candidate_lab` packets show no advice either (advice is built only for `ready`, as specified).
 - The lab that did the original test is not excluded from candidates; it is marked "this is the lab that did the
   original test". In the AP data it is the top candidate in 98 of 283 packets.
-- In AP L10 only three WTP in-house labs list Total Arsenic; the State Level lab does not. A real arsenic record
-  would be routed to those three.
+- In AP L10 only three WTP in-house labs list Total Arsenic; the State Level lab does not. An AP arsenic record
+  would be routed to those three (synthetic test E2c). Bihar arsenic records are routed to Bihar L10 labs only.
+- Digits inside verbatim place names (e.g. village "Rani 3", GP "Samasa-1" in Bihar) are allowed by `fact_guard`, the
+  same way digits in the source text are.
 - `fact_guard` compares numbers after float normalization (2.000 = 2); it allows only the record's value,
   acceptable and permissible limits and ratio, plus digits inside fixed template phrases (IS 10500:2012, WQMIS
   L10, JJM-HB 2.6, CFU/100 ml) and inside verbatim record text (source text, lab name/address, limit ref).
@@ -135,14 +176,19 @@ Notes on what these numbers mean:
   (third-party host, sha256_16 `54348d5f9036b6d1`; F, NO3 and E. coli rows unchanged) and in a scan of the
   Amendment No.1 sheet inside third-party course slides (OCR). The amendment sheet itself was not obtained from the
   official BIS portal. Records still carrying 0.05 go to `needs_review` (LIMIT_MISMATCH). There are no arsenic records in
-  the AP 2024-25 snapshot; arsenic paths are tested with synthetic records only.
+  the AP 2024-25 snapshot. Real arsenic records come from Bihar (592, all carrying WQMIS's own 0.01/0.01 "No relaxation"
+  limits, so none hit LIMIT_MISMATCH); the synthetic AP arsenic tests are kept.
 - **Deployment counters are not impact.** `/api/stats` and the Evaluation page show anonymous in-memory page
   counters since the last restart (bots and `/healthz` excluded, no IP/UA/cookies/query/sample ids stored; snapshot
   logged to stdout every 50 events and on shutdown; `JALSETU_DISABLE_USAGE=1` turns it off). Not users, not
   outcomes, not impact.
 - **JJM documents have no printed edition**; they are pinned by URL and sha256 prefix.
-- Only Andhra Pradesh FY 2024-25 sample-level data is loaded.
+- Sample-level data loaded: Andhra Pradesh FY 2024-25 (all parameters) and Bihar FY 2024-25 (Total arsenic only).
 - Advice is in English only.
+
+## How AgentFoundry was used
+
+Pending — to be filled with screenshots from the AgentFoundry IDE session. Most code in this repo was written with Claude Code CLI outside AgentFoundry.
 
 ## License
 

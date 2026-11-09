@@ -23,7 +23,7 @@ def test_tokens():
 
 
 def test_ap_counts(snap):
-    n = {k: route(k, "", snap.labs)["total"] for k in ("fluoride", "nitrate", "arsenic", "ecoli")}
+    n = {k: route(k, "", snap.labs_for("AP"))["total"] for k in ("fluoride", "nitrate", "arsenic", "ecoli")}
     assert n == {"fluoride": 122, "nitrate": 119, "arsenic": 3, "ecoli": 114}
 
 
@@ -56,4 +56,4 @@ def test_zero_candidates():
 
 
 def test_top5(snap):
-    assert len(route("fluoride", "Kurnool", snap.labs)["labs"]) == 5
+    assert len(route("fluoride", "Kurnool", snap.labs_for("AP"))["labs"]) == 5

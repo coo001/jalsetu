@@ -21,6 +21,7 @@ def build_packet(record: dict, snapshot: Snapshot, use_llm: bool | None = False)
     rid = record_id(record)
     packet = {
         "record_id": rid,
+        "state": record.get("state", "AP"),
         "sample_id": (record.get("sample_id") or "").strip(),
         "record": dict(record),
         "status": None,
@@ -38,7 +39,9 @@ def build_packet(record: dict, snapshot: Snapshot, use_llm: bool | None = False)
     }
     step("snapshot.load_record", {"record_id": rid, "snapshot": snapshot.date}, {"param": record.get("param"), "value": record.get("value")})
 
-    v = validate(record, snapshot.key_counts, {lab["name"] for lab in snapshot.labs}, snapshot.date)
+    state = record.get("state", "AP")
+    labs = snapshot.labs_for(state)
+    v = validate(record, snapshot.key_counts, {lab["name"] for lab in labs}, snapshot.date)
     packet["reasons"], packet["warnings"], packet["lab_match"] = v["reasons"], v["warnings"], v["lab_match"]
     step(
         "record_validator.validate",
@@ -57,9 +60,9 @@ def build_packet(record: dict, snapshot: Snapshot, use_llm: bool | None = False)
         step("pipeline.stop", {"reason_count": len(v["reasons"])}, {"status": "needs_review", "advice": "withheld", "letter": "withheld"})
         return packet
 
-    routed = lab_router.route(pk, record.get("district", ""), snapshot.labs, record.get("lab", ""))
+    routed = lab_router.route(pk, record.get("district", ""), labs, record.get("lab", ""))
     packet["labs"], packet["labs_total"], packet["lab_limit_note"] = routed["labs"], routed["total"], routed["limit_note"]
-    step("lab_router.route", {"param": pk, "district": record.get("district"), "l10_labs": len(snapshot.labs)},
+    step("lab_router.route", {"param": pk, "state": state, "district": record.get("district"), "l10_labs": len(labs)},
          {"candidates": routed["total"], "same_district": routed["same_district_count"], "top": [lab["name"] for lab in routed["labs"]]})
     if routed["total"] == 0:
         packet["status"] = "no_candidate_lab"
@@ -70,7 +73,8 @@ def build_packet(record: dict, snapshot: Snapshot, use_llm: bool | None = False)
     packet["officer_actions"], packet["household_advice"] = adv["officer_actions"], adv["household_advice"]
     step("advice.build", {"param": pk}, {"officer": [a["id"] for a in adv["officer_actions"]], "household": [a["id"] for a in adv["household_advice"]]})
 
-    letter = draft_packet.draft(record, packet["verdict"], pv, routed["labs"][0], universe(snapshot), use_llm=use_llm)
+    extreme = any(w["code"] == "VALUE_EXTREME" for w in v["warnings"])
+    letter = draft_packet.draft(record, packet["verdict"], pv, routed["labs"][0], universe(snapshot), use_llm=use_llm, value_extreme=extreme)
     packet["letter"] = {k: letter[k] for k in ("text", "method", "llm_note")}
     packet["fact_guard"] = letter["fact_guard"]
     step("draft_packet.draft", {"to": routed["labs"][0]["name"], "use_llm": bool(use_llm)}, {"method": letter["method"], "chars": len(letter["text"])})

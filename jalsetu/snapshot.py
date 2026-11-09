@@ -10,8 +10,11 @@ ROOT = Path(__file__).resolve().parent.parent
 SNAPSHOT_ROOT = ROOT / "data" / "snapshots"
 DEFAULT_SNAPSHOT = "2026-11-09"
 
-SAMPLES_FILE = "wq6_AP_2024-2025_samples.csv"
-LABS_FILE = "wq_labs_AP_L10.csv"
+# state code -> (sample files, that state's L10 lab file). Records get `state` from the file they came from.
+STATE_FILES = {
+    "AP": (["wq6_AP_2024-2025_samples.csv"], "wq_labs_AP_L10.csv"),
+    "BR": (["wq6_BR_2024-2025_arsenic_samples.csv"], "wq_labs_BR_L10.csv"),
+}
 STATES_FILE = "wq6_states_2024-2025.csv"
 
 
@@ -30,12 +33,14 @@ def count_rows(path: Path) -> int | None:
         return sum(1 for _ in csv.DictReader(f))
 
 
-def write_manifest(snap_dir: Path, retrieved_utc: str, source_urls: dict) -> dict:
+def write_manifest(snap_dir: Path, retrieved_utc: str, source_urls: dict, file_retrieved: dict | None = None) -> dict:
+    """file_retrieved: optional {file name: retrieved_utc} for files collected at a different time."""
     files = {}
     for p in sorted(snap_dir.iterdir()):
         if p.name == "manifest.json" or not p.is_file():
             continue
-        files[p.name] = {"sha256": sha256_file(p), "rows": count_rows(p)}
+        files[p.name] = {"sha256": sha256_file(p), "rows": count_rows(p),
+                         "retrieved_utc": (file_retrieved or {}).get(p.name, retrieved_utc)}
     manifest = {
         "snapshot": snap_dir.name,
         "retrieved_utc": retrieved_utc,
@@ -77,13 +82,16 @@ class Snapshot:
     dir: Path
     manifest: dict
     samples: list[dict]
-    labs: list[dict]
+    labs: list[dict]  # every state's L10 labs, each tagged with `state`
     states: list[dict]
     key_counts: Counter = field(default_factory=Counter)
 
     @property
     def date(self) -> str:
         return self.dir.name
+
+    def labs_for(self, state: str) -> list[dict]:
+        return [lab for lab in self.labs if lab.get("state") == state]
 
     def recount(self) -> None:
         self.key_counts = Counter(record_key(r) for r in self.samples)
@@ -104,12 +112,11 @@ def record_id(r: dict) -> str:
 def load(snap_dir: Path | None = None, verify_hashes: bool = True) -> Snapshot:
     snap_dir = Path(snap_dir) if snap_dir else SNAPSHOT_ROOT / DEFAULT_SNAPSHOT
     manifest = verify(snap_dir) if verify_hashes else json.loads((snap_dir / "manifest.json").read_text())
-    snap = Snapshot(
-        dir=snap_dir,
-        manifest=manifest,
-        samples=_read_csv(snap_dir / SAMPLES_FILE),
-        labs=_read_csv(snap_dir / LABS_FILE),
-        states=_read_csv(snap_dir / STATES_FILE),
-    )
+    samples, labs = [], []
+    for st, (sample_files, lab_file) in STATE_FILES.items():
+        for name in sample_files:
+            samples += [dict(r, state=st) for r in _read_csv(snap_dir / name)]
+        labs += [dict(r, state=st) for r in _read_csv(snap_dir / lab_file)]
+    snap = Snapshot(dir=snap_dir, manifest=manifest, samples=samples, labs=labs, states=_read_csv(snap_dir / STATES_FILE))
     snap.recount()
     return snap

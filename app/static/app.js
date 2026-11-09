@@ -13,6 +13,7 @@ async function getJSON(url, label) {
     return body;
   } finally { pending--; if (!pending) setStatus(""); }
 }
+const EXTREME_TEXT = "Very high value: check the unit entry with the testing lab. Ratio not verified.";
 const fmt = (v) => (v === null || v === undefined ? "—" : v);
 const badge = (s) => `<span class="st st-${esc(s)}">${esc(s)}</span>`;
 const srcBadges = (item) => item.sources.map((s) => `<a class="src" href="${esc(s.url)}" target="_blank" rel="noopener" title="${esc(s.title)}">${esc(s.id)}</a>`).join(" ") + ` <span class="ref">${esc(item.ref)}</span>`;
@@ -25,12 +26,11 @@ function fail(e) { setStatus(`Could not load: ${e.message}`); }
 async function overview() {
   const d = await getJSON("/api/overview", "Loading overview…");
   $("#caption").textContent = d.caption;
-  const a = d.ap;
-  $("#ap").innerHTML = `<ul class="kv">
+  $("#by-state").innerHTML = Object.entries(d.by_state).map(([st, a]) => `<h3>${esc(a.name)} (${esc(st)})</h3><ul class="kv">
     <li><b>${a.records}</b> contaminated sample records (${Object.entries(a.by_param).map(([k, v]) => `${esc(k)} ${v}`).join(", ")})</li>
-    <li><b>${a.villages}</b> villages in <b>${a.districts}</b> districts; <b>${a.l10_labs}</b> labs in the state L10 list</li>
-    <li>Packet status: ${Object.entries(a.by_status).map(([k, v]) => `${badge(k)} ${v}`).join(" ")}</li></ul>
-    <p><a href="/queue">Open the queue →</a></p>`;
+    <li><b>${a.villages}</b> villages in <b>${a.districts}</b> districts; <b>${a.l10_labs}</b> labs in this state's L10 list</li>
+    <li>Packet status: ${Object.entries(a.by_status).map(([k, v]) => `${badge(k)} ${v}`).join(" ")}</li>
+    <li class="muted">Retrieved ${esc(a.retrieved_utc)}</li></ul>`).join("") + `<p><a href="/queue">Open the queue →</a></p>`;
   const cols = ["State", "Fluoride", "Nitrate", "Total_Arsenic", "TotalEcoil", "TotalColiform", "Iron", "TDS"].map((k) => [k, k.replace("_", " ")]);
   table($("#states"), cols, d.states);
 }
@@ -42,8 +42,8 @@ async function queue() {
   $("#f-param").innerHTML += params.map((p) => `<option>${esc(p)}</option>`).join("");
   let key = "ratio", dir = -1;
   function render() {
-    const fs = $("#f-status").value, fp = $("#f-param").value;
-    const shown = rows.filter((r) => (!fs || r.status === fs) && (!fp || r.param === fp));
+    const fst = $("#f-state").value, fs = $("#f-status").value, fp = $("#f-param").value;
+    const shown = rows.filter((r) => (!fst || r.state === fst) && (!fs || r.status === fs) && (!fp || r.param === fp));
     shown.sort((a, b) => {
       const x = a[key], y = b[key];
       if (x === null || x === undefined) return 1; if (y === null || y === undefined) return -1;
@@ -51,14 +51,14 @@ async function queue() {
     });
     $("#count").textContent = `${shown.length} of ${rows.length} records`;
     $("#queue tbody").innerHTML = shown.map((r) => `<tr>
-      <td><a href="/sample/${encodeURIComponent(r.record_id)}">${esc(r.sample_id || "(missing)")}</a></td>
+      <td>${esc(r.state)}</td><td><a href="/sample/${encodeURIComponent(r.record_id)}">${esc(r.sample_id || "(missing)")}</a></td>
       <td>${esc(r.village)}</td><td>${esc(r.district)}</td><td>${esc(r.param)}</td>
       <td>${esc(fmt(r.value))} / ${esc(fmt(r.permissible))} ${esc(r.unit || "")}</td>
-      <td>${r.ratio === null ? "n/a" : esc(r.ratio.toFixed(2)) + "×"}</td><td>${esc(r.tested)}</td><td>${badge(r.status)}</td></tr>`).join("");
+      <td>${r.ratio === null ? "n/a" : esc(r.ratio.toFixed(2)) + "×"}${r.value_extreme ? `<br><span class="warn">${esc(EXTREME_TEXT)}</span>` : ""}</td><td>${esc(r.tested)}</td><td>${badge(r.status)}</td></tr>`).join("");
     document.querySelectorAll("#queue th").forEach((th) => { th.textContent = th.textContent.replace(/ [▲▼]$/, "") + (th.dataset.k === key ? (dir < 0 ? " ▼" : " ▲") : ""); });
   }
   document.querySelectorAll("#queue th").forEach((th) => th.addEventListener("click", () => { if (key === th.dataset.k) dir = -dir; else { key = th.dataset.k; dir = 1; } render(); }));
-  $("#f-status").addEventListener("change", render); $("#f-param").addEventListener("change", render);
+  $("#f-state").addEventListener("change", render); $("#f-status").addEventListener("change", render); $("#f-param").addEventListener("change", render);
   render();
 }
 
@@ -75,11 +75,11 @@ async function sample() {
   }
   const r = p.record, v = p.verdict;
   let h = `<h1>Sample ${esc(p.sample_id)} ${badge(p.status)}</h1>
-    <p>${esc(r.village)}, GP ${esc(r.gp)}, Block ${esc(r.block)}, District ${esc(r.district)} · ${esc(r.param)} · tested ${esc(r.tested)}</p>`;
+    <p>${esc(r.state)} · ${esc(r.village)}, GP ${esc(r.gp)}, Block ${esc(r.block)}, District ${esc(r.district)} · ${esc(r.param)} · tested ${esc(r.tested)}</p>`;
   h += `<details class="trace noprint" open><summary>Agent trace (${p.trace.length} deterministic tool calls)</summary><ol>${p.trace.map((t) => `<li><code>${esc(t.tool)}</code> <span class="io">in: ${esc(JSON.stringify(t.input))}</span><br><span class="io">out: ${esc(JSON.stringify(t.output))}</span></li>`).join("")}</ol></details>`;
   if (v) {
     h += `<section><h2>Verdict vs IS 10500</h2><p class="verdict ${v.exceeds ? "bad" : ""}">${esc(v.param_display)} ${esc(v.value)} ${esc(v.unit)} ${v.exceeds ? "exceeds" : "does not exceed"} the permissible limit ${esc(v.permissible)} ${esc(v.unit)}${v.permissible_note ? ` (${esc(v.permissible_note)})` : ""}.
-      ${v.ratio !== null ? `Ratio: <b>${esc(v.ratio.toFixed(2))}×</b>.` : "Ratio not applicable (limit is zero); count shown."}</p>
+      ${v.ratio !== null ? `Ratio: <b>${esc(v.ratio.toFixed(2))}×</b>.` : "Ratio not applicable (limit is zero); count shown."}${p.warnings.some((w) => w.code === "VALUE_EXTREME") ? ` <span class="warn">${esc(EXTREME_TEXT)}</span>` : ""}</p>
       <p class="ref">Limit basis: ${esc(v.limit_ref)}</p></section>`;
   }
   if (p.warnings.length) h += `<p class="warn">Warnings: ${p.warnings.map((w) => `<b>${esc(w.code)}</b> ${esc(w.detail)}`).join("; ")}</p>`;

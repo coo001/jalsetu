@@ -2,7 +2,7 @@
 import re
 
 LIMIT_NOTE = (
-    "Candidate labs are listed only because the state's WQMIS lab list (L10, snapshot 2026-11-09) "
+    "Candidate labs are listed only because this state's WQMIS lab list (L10, snapshot 2026-11-09) "
     "says they test this parameter. Current availability, accreditation validity, cost, transport "
     "and turnaround time were NOT checked. Confirm with the lab before sending a sample."
 )

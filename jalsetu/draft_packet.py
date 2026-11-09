@@ -19,7 +19,10 @@ def _ws(s):
     return " ".join((s or "").split())
 
 
-def facts_for(record: dict, verdict: dict, parsed: dict, target_lab: dict) -> dict:
+EXTREME_LINE = "Please confirm the reported value and unit."
+
+
+def facts_for(record: dict, verdict: dict, parsed: dict, target_lab: dict, value_extreme: bool = False) -> dict:
     return {
         "sample_id": record["sample_id"].strip(),
         "village": _ws(record["village"]),
@@ -39,6 +42,7 @@ def facts_for(record: dict, verdict: dict, parsed: dict, target_lab: dict) -> di
         "target_lab": target_lab["name"],
         "target_address": target_lab["address"],
         "tested": record["tested"].strip(),
+        "value_extreme": value_extreme,
     }
 
 
@@ -72,6 +76,7 @@ def template_letter(f: dict) -> str:
             ratio_line,
             f"Original testing laboratory: {f['orig_lab']}",
             f"Original test date: {f['tested']}",
+            *([EXTREME_LINE] if f.get("value_extreme") else []),
             "",
             f"Requested re-test parameters: {retest}.",
             "",
@@ -91,7 +96,8 @@ def _gemini_polish(text: str, api_key: str, timeout: float = 15.0) -> str:
     prompt = (
         "Improve the wording of this official letter for clarity and politeness. "
         "Do NOT change, add or remove any number, date, sample ID, laboratory name, place name or the source text. "
-        "Keep every line that starts with a label (e.g. 'Sample ID:') exactly as written. Return only the letter.\n\n"
+        "Keep every line that starts with a label (e.g. 'Sample ID:') exactly as written, and keep the line "
+        f"'{EXTREME_LINE}' if present. Return only the letter.\n\n"
         + text
     )
     body = json.dumps({"contents": [{"parts": [{"text": prompt}]}]}).encode()
@@ -105,8 +111,9 @@ def _gemini_polish(text: str, api_key: str, timeout: float = 15.0) -> str:
     return data["candidates"][0]["content"]["parts"][0]["text"]
 
 
-def draft(record: dict, verdict: dict, parsed: dict, target_lab: dict, universe: dict, use_llm: bool | None = None) -> dict:
-    facts = facts_for(record, verdict, parsed, target_lab)
+def draft(record: dict, verdict: dict, parsed: dict, target_lab: dict, universe: dict, use_llm: bool | None = None,
+          value_extreme: bool = False) -> dict:
+    facts = facts_for(record, verdict, parsed, target_lab, value_extreme)
     text = template_letter(facts)
     guard = fact_guard.check(text, facts, universe)
     out = {"text": text, "method": "template", "llm_note": "no GEMINI_API_KEY set; template used", "facts": facts, "fact_guard": guard}

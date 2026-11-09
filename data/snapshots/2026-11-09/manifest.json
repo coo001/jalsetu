@@ -6,29 +6,45 @@
     "L10": "https://ejalshakti.gov.in/WQMIS/Main/lab_parameterlist"
   },
   "files": {
+    "br_arsenic_log.json": {
+      "sha256": "98b79f07dfcd4a1ce83cff80149ebedbfe632ba9c86a61673765c89aefcd1c83",
+      "rows": null,
+      "retrieved_utc": "2026-11-09T06:35:29Z"
+    },
     "probe_log.json": {
       "sha256": "a8cf25f4afd7e43e1d9e21ad04bb0bde9b3cc352026956a75578c7127741600f",
-      "rows": null
+      "rows": null,
+      "retrieved_utc": "2026-11-09T01:53:38Z"
     },
     "wq6_AP_2024-2025_samples.csv": {
       "sha256": "ec97a3919b5720a7508165bd0e9c8ed476721a674f48fd81dd171809e1028447",
-      "rows": 283
+      "rows": 283,
+      "retrieved_utc": "2026-11-09T01:53:38Z"
+    },
+    "wq6_BR_2024-2025_arsenic_samples.csv": {
+      "sha256": "c0cb37914d12a92d5a83d853d8f37e2587a2904596520d41f708814a41b37eb6",
+      "rows": 592,
+      "retrieved_utc": "2026-11-09T06:35:29Z"
     },
     "wq6_states_2024-2025.csv": {
       "sha256": "a3e2f0697f0fac4205758f09345a2ccba59908b984cf97b546dd888da789ea12",
-      "rows": 34
+      "rows": 34,
+      "retrieved_utc": "2026-11-09T01:53:38Z"
     },
     "wq6_states_2025-2026.csv": {
       "sha256": "53aa55f71a8f88df3007409e9e3361157692bc1b4df18ee05dd41cb457ce004e",
-      "rows": 34
+      "rows": 34,
+      "retrieved_utc": "2026-11-09T01:53:38Z"
     },
     "wq_labs_AP_L10.csv": {
       "sha256": "d4dd313c57a90ca5843f8f5292bceac95756ab2ce24cf4189728270c67f376bc",
-      "rows": 138
+      "rows": 138,
+      "retrieved_utc": "2026-11-09T01:53:38Z"
     },
     "wq_labs_BR_L10.csv": {
       "sha256": "7a89ed7dc56fb9340e2cdd36aa2e6ad567aecf27450068eebcb0d4ce507ca363",
-      "rows": 123
+      "rows": 123,
+      "retrieved_utc": "2026-11-09T01:53:38Z"
     }
   }
 }

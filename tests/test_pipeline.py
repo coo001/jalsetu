@@ -4,7 +4,7 @@ from jalsetu.pipeline import build_all, build_packet
 
 
 def test_all_ready(snap):
-    assert Counter(p["status"] for p in build_all(snap)) == Counter({"ready": 283})
+    assert Counter((p["state"], p["status"]) for p in build_all(snap)) == Counter({("AP", "ready"): 283, ("BR", "ready"): 592})
 
 
 def test_needs_review_has_no_advice(rec, snap):

@@ -22,7 +22,8 @@ def test_eval_page_honesty_line(client):
 
 def test_samples(client):
     rows = client.get("/api/samples").json()
-    assert len(rows) == 283
+    assert len(rows) == 875
+    assert {r["state"] for r in rows} == {"AP", "BR"}
     ratios = [r["ratio"] for r in rows if r["ratio"] is not None]
     assert ratios == sorted(ratios, reverse=True)
 
@@ -42,6 +43,8 @@ def test_overview_caption(client):
     d = client.get("/api/overview").json()
     assert d["caption"].startswith("Villages with at least one contaminated sample, by parameter")
     assert len(d["states"]) == 34
+    assert {k: v["records"] for k, v in d["by_state"].items()} == {"AP": 283, "BR": 592}
+    assert d["by_state"]["BR"]["retrieved_utc"] == "2026-11-09T06:35:29Z"
 
 
 def test_sources(client):

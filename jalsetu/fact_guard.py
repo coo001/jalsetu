@@ -38,6 +38,9 @@ def check(letter: str, facts: dict, universe: dict) -> dict:
         if _ws(facts[k]).lower() not in text.lower():
             reasons.append(f"missing {k} {facts[k]!r}")
 
+    if facts.get("value_extreme") and "please confirm the reported value and unit." not in text.lower():
+        reasons.append("missing value/unit confirmation line for VALUE_EXTREME")
+
     # 2. every sample-id-like token must be the record's sample id
     allowed_strings = [facts[k] for k in ("source", "target_lab", "target_address", "orig_lab", "limit_ref")] + CONSTANT_PHRASES
     for tok in set(SAMPLE_ID_RE.findall(_remove(text, allowed_strings))):
@@ -61,7 +64,9 @@ def check(letter: str, facts: dict, universe: dict) -> dict:
             reasons.append(f"unexpected village {v!r}")
 
     # 5. every remaining number must equal a record number (after float normalization)
-    numbers_body = _remove(text, allowed_strings + [facts["sample_id"], facts["tested"]])
+    # digits inside verbatim place names (e.g. village 'Rani 3', GP 'Samasa-1') are record text, not numbers
+    place_names = [facts[k] for k in ("village", "gp", "block", "district") if re.search(r"[A-Za-z]", facts[k] or "")]
+    numbers_body = _remove(text, allowed_strings + place_names + [facts["sample_id"], facts["tested"]])
     present_numbers = {float(m) for m in NUMBER_RE.findall(numbers_body)}
     allowed_numbers = {float(facts["value_text"]), float(facts["permissible_text"]), float(facts["acceptable_text"])}
     if facts.get("ratio_text"):

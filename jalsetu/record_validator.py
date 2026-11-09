@@ -18,7 +18,9 @@ REASON_CODES = [
     "SAMPLE_ID_DUPLICATE",
     "TEST_DATE_INVALID",
 ]
-WARNING_CODES = ["LAB_NOT_IN_L10"]
+WARNING_CODES = ["LAB_NOT_IN_L10", "VALUE_EXTREME"]
+EXTREME_FACTOR = 100  # chemical value >= 100 x permissible: likely a unit entry error (warning only)
+EXTREME_UI_TEXT = "Very high value: check the unit entry with the testing lab. Ratio not verified."
 
 DATE_FMT = "%d/%m/%Y %H:%M:%S"
 
@@ -86,6 +88,8 @@ def validate(record: dict, key_counts: Counter, lab_names: set[str], snapshot_da
         if pv["number"] is not None:
             p = float(lim["permissible"])
             below = pv["number"] <= 0 if pk == "ecoli" else pv["number"] <= p
+            if pk != "ecoli" and pv["number"] >= EXTREME_FACTOR * p:
+                warnings.append({"code": "VALUE_EXTREME", "detail": f"value {pv['number']} is >= {EXTREME_FACTOR} x permissible {lim['permissible']}. {EXTREME_UI_TEXT}"})
             if below:
                 add("BELOW_LIMIT_BUT_LISTED", f"value {pv['number']} does not exceed pinned permissible {lim['permissible']} but the record is listed as contaminated")
 

@@ -1,4 +1,4 @@
-"""Reproducibility and safety checks E1-E7 on the pinned snapshot. Not field impact.
+"""Reproducibility and safety checks E1-E7 on the pinned snapshot (AP; subset re-run on BR with suffix _BR). Not field impact.
 
 Usage: python eval/run_eval.py   (or `make eval`)
 """
@@ -53,23 +53,25 @@ def row(id_, name, target, measured, passed, note=""):
 
 
 # ---------------- E1
-def e1(snap, packets):
+def e1(snap, packets, sfx=""):
+    recs = [p["record"] for p in packets]
     numeric, exceeds = 0, 0
-    for r in snap.samples:
+    for r in recs:
         pk, pv = pinned.param_key(r["param"]), parse_value(r["value"])
         if pk and pv["number"] is not None and pv["unit"]:
             numeric += 1
             exceeds += verdict(pk, pv["number"], pv["unit"])["exceeds"]
-    d = {"label": "reproduction, not independent accuracy", "records": len(snap.samples), "numeric": numeric, "exceeds_by_our_rule": exceeds,
-         "by_param": dict(Counter(r["param"] for r in snap.samples))}
-    return d, [row("E1", "Government verdict reproduction (reproduction, not independent accuracy)",
-                   "all records with numeric values exceed by our rule", f"{exceeds}/{numeric} numeric records exceed (of {len(snap.samples)} records)",
+    d = {"label": "reproduction, not independent accuracy", "records": len(recs), "numeric": numeric, "exceeds_by_our_rule": exceeds,
+         "by_param": dict(Counter(r["param"] for r in recs))}
+    return d, [row("E1" + sfx, "Government verdict reproduction (reproduction, not independent accuracy)",
+                   "all records with numeric values exceed by our rule", f"{exceeds}/{numeric} numeric records exceed (of {len(recs)} records)",
                    exceeds == numeric)]
 
 
 # ---------------- E2
-def e2(snap, packets):
-    by_name = {norm_name(lab["name"]): lab for lab in snap.labs}
+def e2(snap, packets, state="AP", sfx=""):
+    state_labs = snap.labs_for(state)
+    by_name = {norm_name(lab["name"]): lab for lab in state_labs}
     ready = [p for p in packets if p["status"] == "ready"]
     checked = unsuitable = 0
     for p in ready:
@@ -81,52 +83,57 @@ def e2(snap, packets):
     hit = sum(any(lab["same_district"] for lab in p["labs"]) for p in ready)
     top_hit = sum(p["labs"][0]["same_district"] for p in ready)
 
-    base = snap.samples[0]
-    s = fresh(snap)
-    ars = dict(base, param="Total arsenic", acceptable="0.01", permissible="0.01", value="0.050 (mg/l)")
-    pa = build_packet(ars, s)
-    s0 = fresh(snap)
-    s0.labs = [lab for lab in s0.labs if "arsenic" not in lab["parameters"].lower()]
-    pz = build_packet(ars, s0)
-
     rnd = random.Random(SEED)
     unstable = 0
     for p in ready:
         want = [lab["name"] for lab in p["labs"]]
         for _ in range(3):
-            labs = list(snap.labs)
+            labs = list(state_labs)
             rnd.shuffle(labs)
             if [lab["name"] for lab in route(p["verdict"]["param"], p["record"]["district"], labs, p["record"]["lab"])["labs"]] != want:
                 unstable += 1
                 break
 
-    raw_names = {lab["name"] for lab in snap.labs}
+    raw_names = {lab["name"] for lab in state_labs}
     norm_names = {norm_name(n) for n in raw_names}
-    sample_labs = Counter(r["lab"] for r in snap.samples)
+    sample_labs = Counter(p["record"]["lab"] for p in packets)
     before = [n for n in sample_labs if n not in raw_names]
     after = [n for n in sample_labs if norm_name(n) not in norm_names]
     d = {
+        "state": state, "l10_labs": len(state_labs),
         "ready_packets": len(ready), "candidate_labs_checked": checked, "unsuitable": unsuitable,
         "packets_with_same_district_candidate": hit, "packets_without_same_district_candidate": len(ready) - hit,
         "packets_top_lab_same_district": top_hit,
-        "synthetic_arsenic": {"status": pa["status"], "labs_total": pa["labs_total"], "labs": [lab["name"] for lab in pa["labs"]]},
-        "synthetic_zero_lab": {"status": pz["status"], "letter": pz["letter"], "note": pz["lab_limit_note"],
-                               "how": "arsenic record routed against AP L10 with the 3 arsenic-capable labs removed"},
         "tie_order_unstable_packets": unstable, "shuffles_per_packet": 3,
         "sample_lab_names_distinct": len(sample_labs),
         "not_in_l10_before_normalization": {"names": len(before), "records": sum(sample_labs[n] for n in before), "list": before},
         "not_in_l10_after_normalization": {"names": len(after), "records": sum(sample_labs[n] for n in after), "list": after},
     }
     rows = [
-        row("E2a", "Candidate labs whose L10 list lacks the parameter", "0", f"{unsuitable} of {checked} candidate slots ({len(ready)} ready packets)", unsuitable == 0),
-        row("E2b", "Ready packets with a same-district candidate", "report", f"{hit} with / {len(ready) - hit} without (top lab same-district: {top_hit})", True,
+        row("E2a" + sfx, "Candidate labs whose L10 list lacks the parameter", "0", f"{unsuitable} of {checked} candidate slots ({len(ready)} ready packets)", unsuitable == 0),
+        row("E2b" + sfx, "Ready packets with a same-district candidate", "report", f"{hit} with / {len(ready) - hit} without (top lab same-district: {top_hit})", True,
             "same-district = district name appears in L10 lab name or address"),
+        row("E2e" + sfx, "Lab order stable under input shuffles", "0 unstable", f"{unstable} unstable of {len(ready)}", unstable == 0),
+        row("E2f" + sfx, "Sample lab names not in L10", "report", f"before normalization {len(before)}/{len(sample_labs)} names ({d['not_in_l10_before_normalization']['records']} records); after {len(after)}/{len(sample_labs)}",
+            True, "whitespace/case normalization"),
+    ]
+    if state != "AP":
+        return d, rows
+
+    base = snap.samples[0]
+    s = fresh(snap)
+    ars = dict(base, param="Total arsenic", acceptable="0.01", permissible="0.01", value="0.050 (mg/l)")
+    pa = build_packet(ars, s)
+    s0 = fresh(snap)
+    s0.labs = [lab for lab in s0.labs if not (lab["state"] == "AP" and "arsenic" in lab["parameters"].lower())]
+    pz = build_packet(ars, s0)
+    d["synthetic_arsenic"] = {"status": pa["status"], "labs_total": pa["labs_total"], "labs": [lab["name"] for lab in pa["labs"]]}
+    d["synthetic_zero_lab"] = {"status": pz["status"], "letter": pz["letter"], "note": pz["lab_limit_note"],
+                               "how": "arsenic record routed against AP L10 with the 3 arsenic-capable labs removed"}
+    rows[2:2] = [
         row("E2c", "Synthetic arsenic case on AP L10", "ready, 3 candidate labs", f"{pa['status']}, {pa['labs_total']} labs", pa["status"] == "ready" and pa["labs_total"] == 3),
         row("E2d", "Synthetic parameter with zero labs", "no_candidate_lab, no letter", f"{pz['status']}, letter={'none' if pz['letter'] is None else 'present'}",
             pz["status"] == "no_candidate_lab" and pz["letter"] is None),
-        row("E2e", "Lab order stable under input shuffles", "0 unstable", f"{unstable} unstable of {len(ready)}", unstable == 0),
-        row("E2f", "Sample lab names not in L10", "report", f"before normalization {len(before)}/{len(sample_labs)} names ({d['not_in_l10_before_normalization']['records']} records); after {len(after)}/{len(sample_labs)}",
-            True, "whitespace/case normalization"),
     ]
     return d, rows
 
@@ -163,12 +170,29 @@ def _mutations(r, kind, i):
     raise KeyError(kind)
 
 
+def e3_fp(snap, packets, state="AP", sfx=""):
+    lab_names = {lab["name"] for lab in snap.labs_for(state)}
+    fp = [p["sample_id"] for p in packets if p["status"] != "ready"]
+    lab_warn = sum(1 for p in packets if any(w["code"] == "LAB_NOT_IN_L10" for w in validate(p["record"], snap.key_counts, lab_names, snap.date)["warnings"]))
+    d = {"count": len(fp), "ids": fp, "lab_not_in_l10_warnings": lab_warn}
+    return d, row("E3.FP" + sfx, f"False positives on the {len(packets)} original records", "0", f"{len(fp)} of {len(packets)}", not fp,
+                  f"LAB_NOT_IN_L10 warnings (non-blocking): {lab_warn}")
+
+
+def value_extreme(packets, sfx=""):
+    hits = [{"record_id": p["record_id"], "value": p["record"]["value"], "ratio": (p["verdict"] or {}).get("ratio"), "status": p["status"]}
+            for p in packets if any(w["code"] == "VALUE_EXTREME" for w in p["warnings"])]
+    return {"rule": "chemical value >= 100 x permissible (warning, does not stop)", "count": len(hits), "records": hits}, row(
+        "VALUE_EXTREME" + sfx, "Records flagged VALUE_EXTREME (likely unit entry error)", "report", str(len(hits)), True,
+        "; ".join(f"{h['record_id']} {h['value']}" for h in hits))
+
+
 def e3(snap, packets, per_type=10):
     rnd = random.Random(SEED)
-    lab_names = {lab["name"] for lab in snap.labs}
+    ap_idx = [i for i, r in enumerate(snap.samples) if r["state"] == "AP"]
     out, rows, mutated_packets = {}, [], []
     for kind in REASON_CODES:
-        picks = rnd.sample(range(len(snap.samples)), per_type)
+        picks = rnd.sample(ap_idx, per_type)
         ok, misses = 0, []
         for i, idx in enumerate(picks):
             s = fresh(snap)
@@ -187,11 +211,8 @@ def e3(snap, packets, per_type=10):
             mutated_packets.append(p)
         out[kind] = {"mutated": per_type, "caught": ok, "misses": misses}
         rows.append(row(f"E3.{kind}", f"Error injection: {kind}", f"{per_type}/{per_type} needs_review with {kind}", f"{ok}/{per_type}", ok == per_type))
-    fp = [p["sample_id"] for p in packets if p["status"] != "ready"]
-    lab_warn = sum(1 for r in snap.samples if validate(r, snap.key_counts, lab_names, snap.date)["warnings"])
-    out["false_positives_on_originals"] = {"count": len(fp), "ids": fp, "lab_not_in_l10_warnings": lab_warn}
-    rows.append(row("E3.FP", "False positives on the 283 original records", "0", f"{len(fp)} of {len(packets)}", not fp,
-                    f"LAB_NOT_IN_L10 warnings (non-blocking): {lab_warn}"))
+    out["false_positives_on_originals"], fp_row = e3_fp(snap, packets)
+    rows.append(fp_row)
     return out, rows, mutated_packets
 
 
@@ -201,13 +222,20 @@ def _swap_digit(s):
     return s[:i] + str((int(s[i]) + 1) % 10) + s[i + 1:]
 
 
-def e4(snap, packets):
+def e4a(packets, sfx=""):
     ready = [p for p in packets if p["status"] == "ready"]
     passed = sum(p["fact_guard"]["passed"] for p in ready)
+    d = {"ready": len(ready), "template_letters_passed": passed}
+    return d, row("E4a" + sfx, "Template letters pass fact_guard", f"{len(ready)}/{len(ready)}", f"{passed}/{len(ready)}", passed == len(ready))
+
+
+def e4(snap, packets):
+    ready = [p for p in packets if p["status"] == "ready"]
+    d4a, row4a = e4a(packets)
     uni = universe(snap)
     rnd = random.Random(SEED)
     chem = [p for p in ready if p["verdict"]["ratio"] is not None]
-    villages = sorted({r["village"] for r in snap.samples})
+    villages = sorted({r["village"] for r in snap.samples if r["state"] == "AP"})
     kinds = ["wrong_value", "wrong_permissible", "wrong_ratio", "wrong_sample_id", "wrong_target_lab", "wrong_original_lab", "wrong_village", "wrong_date", "extra_number"]
     results = Counter()
     misses = []
@@ -225,10 +253,10 @@ def e4(snap, packets):
             elif kind == "wrong_sample_id":
                 bad = t.replace(f["sample_id"], _swap_digit(f["sample_id"]))
             elif kind == "wrong_target_lab":
-                other = rnd.choice([lab["name"] for lab in snap.labs if norm_name(lab["name"]) not in (norm_name(f["target_lab"]), norm_name(f["orig_lab"]))])
+                other = rnd.choice([lab["name"] for lab in snap.labs_for("AP") if norm_name(lab["name"]) not in (norm_name(f["target_lab"]), norm_name(f["orig_lab"]))])
                 bad = t.replace(f"In-charge, {f['target_lab']}", f"In-charge, {other}")
             elif kind == "wrong_original_lab":
-                other = rnd.choice([lab["name"] for lab in snap.labs if norm_name(lab["name"]) not in (norm_name(f["target_lab"]), norm_name(f["orig_lab"]))])
+                other = rnd.choice([lab["name"] for lab in snap.labs_for("AP") if norm_name(lab["name"]) not in (norm_name(f["target_lab"]), norm_name(f["orig_lab"]))])
                 bad = t.replace(f"laboratory: {f['orig_lab']}", f"laboratory: {other}")
             elif kind == "wrong_village":
                 other = rnd.choice([v for v in villages if v.lower() not in {f[k].lower() for k in ("village", "gp", "block", "district")} and len(v) >= 5])
@@ -245,9 +273,9 @@ def e4(snap, packets):
             else:
                 results[kind] += 1
     rejected = sum(results.values())
-    d = {"ready": len(ready), "template_letters_passed": passed, "injected": total, "rejected": rejected, "by_kind": dict(results), "misses": misses}
+    d = {**d4a, "injected": total, "rejected": rejected, "by_kind": dict(results), "misses": misses}
     return d, [
-        row("E4a", "Template letters pass fact_guard", f"{len(ready)}/{len(ready)}", f"{passed}/{len(ready)}", passed == len(ready)),
+        row4a,
         row("E4b", "Injected wrong numbers / ids / lab names / villages / dates rejected", f"{total}/{total}", f"{rejected}/{total}", rejected == total,
             f"{len(kinds)} kinds x 5 letters"),
     ]
@@ -265,11 +293,14 @@ def e5():
 
 
 # ---------------- E6
-def e6(snap, packets, mutated):
+def e6(snap, packets, mutated, sfx=""):
     srcs = pinned.sources()
-    s = fresh(snap)
-    ars = build_packet(dict(snap.samples[0], param="Total arsenic", acceptable="0.01", permissible="0.01", value="0.050 (mg/l)"), s)
-    allp = packets + [ars] + mutated
+    if sfx:  # BR: real records only
+        allp = list(packets)
+    else:
+        s = fresh(snap)
+        ars = build_packet(dict(snap.samples[0], param="Total arsenic", acceptable="0.01", permissible="0.01", value="0.050 (mg/l)"), s)
+        allp = packets + [ars] + mutated
     lines = [a for p in allp for a in p["officer_actions"] + p["household_advice"]]
     unsourced = sum(1 for a in lines if not a["sources"] or any(x["id"] not in srcs for x in a["sources"]))
     table_text = {line["id"]: line["text"] for line in pinned.table()["lines"]}
@@ -286,19 +317,22 @@ def e6(snap, packets, mutated):
     d = {"packets_checked": len(allp), "advice_lines": len(lines), "unsourced": unsourced, "not_verbatim": not_verbatim,
          "needs_review_packets": len(nr), "needs_review_with_advice_or_letter": nr_with_advice, "forbidden_boil_lines": boil_bad}
     return d, [
-        row("E6a", "Advice lines with a source id present in sources.json", f"{len(lines)}/{len(lines)}", f"{len(lines) - unsourced}/{len(lines)} (verbatim from table: {len(lines) - not_verbatim})",
+        row("E6a" + sfx, "Advice lines with a source id present in sources.json", f"{len(lines)}/{len(lines)}", f"{len(lines) - unsourced}/{len(lines)} (verbatim from table: {len(lines) - not_verbatim})",
             unsourced == 0 and not_verbatim == 0),
-        row("E6b", "needs_review packets with any advice or letter", "0", f"{nr_with_advice} of {len(nr)}", nr_with_advice == 0),
-        row("E6c", "'boil' text in chemical packets (except nitrate H_N2)", "0", str(boil_bad), boil_bad == 0, "includes synthetic arsenic packet"),
+        row("E6b" + sfx, "needs_review packets with any advice or letter", "0", f"{nr_with_advice} of {len(nr)}", nr_with_advice == 0),
+        row("E6c" + sfx, "'boil' text in chemical packets (except nitrate H_N2)", "0", str(boil_bad), boil_bad == 0, "real BR arsenic packets" if sfx else "includes synthetic arsenic packet"),
     ]
 
 
 # ---------------- E7
-def e7(snap, packets):
+CSV_COLS = ["param", "district", "block", "gp", "village", "village_id", "sample_id", "source", "acceptable", "permissible", "value", "lab", "tested"]
+
+
+def e7(snap, packets, sfx=""):
     by_id = {p["record_id"]: p for p in packets}
     order = sorted(by_id, key=lambda rid: (hashlib.sha256(by_id[rid]["sample_id"].encode()).hexdigest(), rid))[:30]
-    path = ROOT / "eval" / "public_sample_30.csv"
-    cols = list(snap.samples[0].keys())
+    path = ROOT / "eval" / f"public_sample_30{sfx}.csv"
+    cols = CSV_COLS
     with path.open("w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
         w.writerow(cols + ["status", "reasons", "exceeds", "ratio", "limit_ref", "top_lab", "top_lab_same_district", "advice_ids", "fact_guard"])
@@ -311,15 +345,17 @@ def e7(snap, packets):
                 ";".join(a["id"] for a in p["officer_actions"] + p["household_advice"]),
                 (p["fact_guard"] or {}).get("passed"),
             ])
-    d = {"rule": "sort records by sha256(sample_id) ascending (ties by record id), first 30", "file": "eval/public_sample_30.csv",
+    d = {"rule": "sort records by sha256(sample_id) ascending (ties by record id), first 30", "file": f"eval/public_sample_30{sfx}.csv",
          "statuses": dict(Counter(by_id[r]["status"] for r in order)), "record_ids": order}
-    return d, [row("E7", "Public sample of 30 records for manual checking", "30 rows written", f"{len(order)} rows; statuses {dict(d['statuses'])}", len(order) == 30,
-                   "sha256(sample_id) rule; eval/public_sample_30.csv")]
+    return d, [row("E7" + sfx, "Public sample of 30 records for manual checking", "30 rows written", f"{len(order)} rows; statuses {dict(d['statuses'])}", len(order) == 30,
+                   f"sha256(sample_id) rule; eval/public_sample_30{sfx}.csv")]
 
 
 def main():
     snap = snapshot.load()  # raises if any hash differs from the manifest
-    packets = [build_packet(r, snap, use_llm=False) for r in snap.samples]
+    all_packets = [build_packet(r, snap, use_llm=False) for r in snap.samples]
+    packets = [p for p in all_packets if p["state"] == "AP"]
+    br = [p for p in all_packets if p["state"] == "BR"]
     details, summary = {}, []
     for name, fn in [("E1", lambda: e1(snap, packets)), ("E2", lambda: e2(snap, packets))]:
         d, rows = fn()
@@ -327,6 +363,16 @@ def main():
     d3, rows3, mutated = e3(snap, packets)
     details["E3"], summary = d3, summary + rows3
     for name, fn in [("E4", lambda: e4(snap, packets)), ("E5", e5), ("E6", lambda: e6(snap, packets, mutated)), ("E7", lambda: e7(snap, packets))]:
+        d, rows = fn()
+        details[name], summary = d, summary + rows
+    # Bihar (real Total arsenic records): same checks, separate keys with suffix _BR
+    one = lambda d, r: (d, [r])  # noqa: E731
+    for name, fn in [("E1_BR", lambda: e1(snap, br, "_BR")), ("E2_BR", lambda: e2(snap, br, "BR", "_BR")),
+                     ("E3_BR", lambda: one(*e3_fp(snap, br, "BR", "_BR"))),
+                     ("E4a_BR", lambda: one(*e4a(br, "_BR"))),
+                     ("E6_BR", lambda: e6(snap, br, [], "_BR")),
+                     ("VALUE_EXTREME_BR", lambda: one(*value_extreme(br, "_BR"))),
+                     ("E7_BR", lambda: e7(snap, br, "_BR"))]:
         d, rows = fn()
         details[name], summary = d, summary + rows
     now = dt.datetime.now(dt.timezone.utc)

@@ -55,9 +55,18 @@ def healthz():
     return {"ok": True}
 
 
+STATE_NAMES = {"AP": "Andhra Pradesh", "BR": "Bihar"}
+
+
+def retrieved_by_state(snap) -> dict:
+    files = snap.manifest["files"]
+    return {st: files[names[0]].get("retrieved_utc", snap.manifest["retrieved_utc"]) for st, (names, _) in snapshot.STATE_FILES.items()}
+
+
 def footer(snap) -> str:
+    when = ", ".join(f"{st} {t}" for st, t in retrieved_by_state(snap).items())
     return (
-        f'<footer>Data snapshot: {snap.date} (WQMIS, retrieved {snap.manifest["retrieved_utc"]}). '
+        f'<footer>Data snapshot: {snap.date} (WQMIS, retrieved {when}). '
         "Decision support only. A qualified officer must confirm every action. "
         'Code: MIT License. <a href="/sources">Sources</a> · <a href="/eval">Evaluation</a></footer>'
     )
@@ -102,24 +111,30 @@ def eval_page(request: Request):
 @app.get("/api/meta")
 def api_meta():
     snap, _ = state()
-    return {"snapshot": snap.date, "retrieved_utc": snap.manifest["retrieved_utc"], "source_urls": snap.manifest["source_urls"]}
+    return {"snapshot": snap.date, "retrieved_utc": snap.manifest["retrieved_utc"], "retrieved_utc_by_state": retrieved_by_state(snap),
+            "source_urls": snap.manifest["source_urls"]}
 
 
 @app.get("/api/overview")
 def api_overview():
     snap, packets = state()
-    ps = list(packets.values())
-    return {
-        "caption": f"Villages with at least one contaminated sample, by parameter (a village can appear under several parameters; not a count of people). Source: WQMIS WQ6, retrieved {snap.date} 01:53 UTC.",
-        "states": snap.states,
-        "ap": {
+    by_state = {}
+    for st in snapshot.STATE_FILES:
+        ps = [p for p in packets.values() if p["state"] == st]
+        by_state[st] = {
+            "name": STATE_NAMES[st],
+            "retrieved_utc": retrieved_by_state(snap)[st],
             "records": len(ps),
             "by_param": Counter(p["record"]["param"] for p in ps),
             "by_status": Counter(p["status"] for p in ps),
             "districts": len({p["record"]["district"] for p in ps}),
             "villages": len({p["record"]["village_id"] for p in ps}),
-            "l10_labs": len(snap.labs),
-        },
+            "l10_labs": len(snap.labs_for(st)),
+        }
+    return {
+        "caption": f"Villages with at least one contaminated sample, by parameter (a village can appear under several parameters; not a count of people). Source: WQMIS WQ6, retrieved {snap.manifest['retrieved_utc']}.",
+        "states": snap.states,
+        "by_state": by_state,
     }
 
 
@@ -128,6 +143,7 @@ def _row(p: dict) -> dict:
     pv = parse_value(r.get("value"))
     return {
         "record_id": p["record_id"],
+        "state": p["state"],
         "sample_id": p["sample_id"],
         "village": r.get("village"),
         "district": r.get("district"),
@@ -138,6 +154,7 @@ def _row(p: dict) -> dict:
         "ratio": v.get("ratio"),
         "tested": r.get("tested"),
         "status": p["status"],
+        "value_extreme": any(w["code"] == "VALUE_EXTREME" for w in p["warnings"]),
     }
 
 

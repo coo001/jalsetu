@@ -1,0 +1,12 @@
+# Render Blueprint (free plan). Render injects PORT; the Dockerfile reads it.
+services:
+  - type: web
+    name: jalsetu
+    runtime: docker
+    plan: free
+    region: singapore
+    healthCheckPath: /healthz
+    autoDeploy: true
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false
