@@ -1,0 +1,19 @@
+AgentFoundry 0.1.80 IDE terminal, project "build", 2026-11-09 KST
+
+E6a_BR                       OK  target=4144/4144 | measured=4144/4144 (verbatim from table: 4144)
+E6b_BR                       OK  target=0 | measured=0 of 0
+E6c_BR                       OK  target=0 | measured=0
+VALUE_EXTREME_BR             OK  target=report | measured=2
+E7_BR                        OK  target=30 rows written | measured=30 rows; statuses {'ready': 30}
+all targets met: True
+cooui-MacBookPro :: contest-work/code-for-a-billion/build ‹main*› » make test 2>&1 | tail -4; make eval 2>&1 | tail -6
+    from starlette.testclient import TestClient as TestClient  # noqa
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+115 passed, 1 warning in 7.81s
+E6a_BR                       OK  target=4144/4144 | measured=4144/4144 (verbatim from table: 4144)
+E6b_BR                       OK  target=0 | measured=0 of 0
+E6c_BR                       OK  target=0 | measured=0
+VALUE_EXTREME_BR             OK  target=report | measured=2
+E7_BR                        OK  target=30 rows written | measured=30 rows; statuses {'ready': 30}
+all targets met: True
+cooui-MacBookPro :: contest-work/code-for-a-billion/build ‹main*› »  

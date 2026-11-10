@@ -15,6 +15,9 @@ packet stops with `needs_review` and the reasons, and produces **no advice and n
 All decisions are deterministic code. An LLM is optional and may only reword the letter; the app works fully
 without any API key.
 
+Live demo: https://jalsetu-5ftx.onrender.com (Render free tier; the first request after idle can take about a minute)  
+Source: https://github.com/coo001/jalsetu
+
 ## Impact
 
 No field users or remediation outcomes yet (solo builder, no local partner). The numbers below are reproducible checks on real government records, not impact.
@@ -191,7 +194,11 @@ Notes on what these numbers mean:
 
 ## How AgentFoundry was used
 
-Pending — to be filled with screenshots from the AgentFoundry IDE session. Most code in this repo was written with Claude Code CLI outside AgentFoundry.
+Stated plainly so judges can weigh it:
+
+- Most of the code in this repo was written with Claude Code CLI outside AgentFoundry.
+- The project was opened in the AgentFoundry 0.1.80 desktop IDE (macOS, signed in), and the test suite and the evaluation harness were run from the AgentFoundry terminal on 2026-11-09 and 2026-11-10: `make test` (115 passed) and `make eval` (all targets met).
+- Evidence: `docs/agentfoundry/af_ide_make_test_eval_20261110.png` (IDE screenshot) and `docs/agentfoundry/af_terminal_20261109.txt` (terminal transcript).
 
 ## License
 

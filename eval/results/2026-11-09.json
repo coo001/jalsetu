@@ -1,8 +1,8 @@
 {
   "statement": "These are reproducibility and safety checks on real government records, not field impact. No field users or remediation outcomes yet.",
   "command": "python eval/run_eval.py",
-  "git_commit": "651fca9ffb20f4df92fa4fcc022f4e71ad2c651d",
-  "timestamp_utc": "2026-11-09T06:52:30Z",
+  "git_commit": "uncommitted (working tree differs from 16ebd1096901)",
+  "timestamp_utc": "2026-11-09T11:25:27Z",
   "snapshot": "2026-11-09",
   "snapshot_hashes": {
     "br_arsenic_log.json": "98b79f07dfcd4a1ce83cff80149ebedbfe632ba9c86a61673765c89aefcd1c83",
