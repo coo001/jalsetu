@@ -22,6 +22,15 @@ Source: https://github.com/coo001/jalsetu
 
 No field users or remediation outcomes yet (solo builder, no local partner). The numbers below are reproducible checks on real government records, not impact.
 
+### Wording limits
+
+- JalSetu produces next-action packets and letter drafts; it does not deliver them or fix contamination.
+- E1 reproduces the government's contaminated list (283 AP + 592 BR records); it is not independent accuracy and
+  not a count of people affected.
+- Labs are "candidate labs listed in L10", not recommended, available or accredited labs.
+- Page counters are page-visit counts, not users or impact.
+- AgentFoundry was used to open the project and run tests/evals; most code was written outside it.
+
 ## Quick start
 
 ```bash
@@ -95,6 +104,7 @@ Amendment No.1, 2015); E. coli 0 CFU/100 ml. Chemical exceeds if value > permiss
 ## Evaluation (measured, run 2026-11-09, `make eval`)
 
 Full output: `eval/results/2026-11-09.json`. Reproducibility and safety checks only.
+`latest.json`'s `git_commit` is the code commit the eval ran on; the results are committed in the next commit.
 
 | ID | Check | Target | Measured |
 |---|---|---|---|
@@ -146,8 +156,11 @@ Notes on what these numbers mean:
   contains the WQMIS district spelling (e.g. L10 spells "Sri Satya Sai", WQ6 spells "SRI SATHYA SAI"); no fuzzy
   matching is done.
 
-### Second code path check of the public samples
-`python eval/independent_check.py AP` and `... BR` re-derive selection, verdict, ratio, lab capability, same-district flag and advice ids for `eval/public_sample_30.csv` and `eval/public_sample_30_BR.csv` from the raw CSVs without importing `jalsetu`. Result 2026-11-09: AP 300/300 checks, BR 300/300 checks, 0 mismatching rows (`eval/results/independent_check_30*.json`). This is a second implementation by the same solo builder, not an external or field validation. Five AP rows were also checked by hand (value ÷ limit, lab parameter list, district match): no discrepancy.
+### Same-author second-implementation check of the public samples
+`python eval/independent_check.py AP` and `... BR` re-derive selection, verdict, ratio, lab capability, same-district flag and advice ids for `eval/public_sample_30.csv` and `eval/public_sample_30_BR.csv` from the raw CSVs without importing `jalsetu`. Result 2026-11-09: AP 300/300 checks, BR 300/300 checks, 0 mismatching rows (`eval/results/independent_check_30*.json`). This is a same-author second implementation (not independent verification), and not an external or field validation. Five AP rows were also checked by hand (value ÷ limit, lab parameter list, district match): no discrepancy.
+
+### AI-assisted re-comparison against live WQMIS (10 records)
+`python eval/recheck_live.py` takes the first 5 AP and the first 5 BR records of the public samples, re-fetches each record's village from WQMIS, and compares value, limits (against the stored row and against the pinned IS 10500 table values), lab and test date. Result (`eval/results/recheck_live_10.json`, run 2026-11-10T01:37:00Z): 10 records compared, 0 mismatching records. This is AI-assisted, not a human check; it uses the same author/tooling as the collector; it covers 10 of the 60 public-sample records (30 per state sample), out of 875 stored records (283 AP + 592 BR).
 
 ## Design choices made without asking
 
@@ -176,12 +189,12 @@ Notes on what these numbers mean:
   accreditation, cost, transport and turnaround are not checked (stated on every packet).
 - **WQ2 remedial-action records are not collectable** from the public pages, so the tool cannot see whether any
   action was already taken.
-- **Arsenic amendment verified from third-party copies.** The original 2012 table prints 0.05 mg/l permissible;
+- **Arsenic limit basis is third-party copies only.** The original 2012 table prints 0.05 mg/l permissible;
   Amendment No.1 (June 2015) substitutes "No relaxation" for 0.05 in Table 3 (x), so 0.01 mg/l is the permissible
-  limit. Verified 2026-11-09 in a consolidated BIS copy "Incorporating Amendments 1 (2015), 2 (2018), 3&4(2021)"
-  (third-party host, sha256_16 `54348d5f9036b6d1`; F, NO3 and E. coli rows unchanged) and in a scan of the
-  Amendment No.1 sheet inside third-party course slides (OCR). The amendment sheet itself was not obtained from the
-  official BIS portal. Records still carrying 0.05 go to `needs_review` (LIMIT_MISMATCH). There are no arsenic records in
+  limit. Limit basis = a third-party consolidated BIS copy "Incorporating Amendments 1 (2015), 2 (2018), 3&4(2021)"
+  (read 2026-11-09; sha256_16 `54348d5f9036b6d1`; F, NO3 and E. coli rows unchanged) and a scan of the
+  Amendment No.1 sheet inside third-party course slides (OCR). The official BIS portal text was not obtained; this is
+  not a confirmation from the official BIS portal, and a human has not re-read it against official text. Records still carrying 0.05 go to `needs_review` (LIMIT_MISMATCH). There are no arsenic records in
   the AP 2024-25 snapshot. Real arsenic records come from Bihar (592, all carrying WQMIS's own 0.01/0.01 "No relaxation"
   limits, so none hit LIMIT_MISMATCH); the synthetic AP arsenic tests are kept.
 - **Deployment counters are not impact.** `/api/stats` and the Evaluation page show anonymous in-memory page
