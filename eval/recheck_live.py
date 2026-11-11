@@ -1,6 +1,6 @@
-"""AI-assisted re-comparison of 10 public-sample records against live WQMIS (not a human check).
+"""AI-assisted re-comparison of the public-sample records (default 30 AP + 30 BR = 60) against live WQMIS (not a human check).
 Re-fetches each record's village from WQMIS and compares value, limits, lab and test date with the stored snapshot rows,
-and compares the limits with the IS 10500 table values pinned in jalsetu/guidance. Run: python eval/recheck_live.py"""
+and compares the limits with the IS 10500 table values pinned in jalsetu/guidance. Run: python eval/recheck_live.py [N_per_state]. Fetch failures are recorded (not hidden) in "errors"."""
 import csv, json, sys, datetime as dt
 from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
@@ -17,12 +17,20 @@ def pick(path, n):
     return rows[:n]
 
 def main():
-    cases = [("AP", 2, r) for r in pick("public_sample_30.csv", 5)] + [("BR", 5, r) for r in pick("public_sample_30_BR.csv", 5)]
+    n = int(sys.argv[1]) if len(sys.argv) > 1 else 30
+    cases = [("AP", 2, r) for r in pick("public_sample_30.csv", n)] + [("BR", 5, r) for r in pick("public_sample_30_BR.csv", n)]
     c = Client(timeout=120, retries=3); c.start_session()
-    out = []
+    out = []; errors = []; cache = {}
     for st, sid, r in cases:
         p = r["param"]
-        live = c.post("Contaminantwisesamplefillist", cpage=1, paraname=p, stid=sid, dtid=0, villid=int(r["village_id"]), fy="2024-2025")["Contaminantwise"]
+        key = (sid, p, r["village_id"])
+        try:
+            if key not in cache:
+                cache[key] = c.post("Contaminantwisesamplefillist", cpage=1, paraname=p, stid=sid, dtid=0, villid=int(r["village_id"]), fy="2024-2025")["Contaminantwise"]
+        except Exception as e:
+            errors.append({"state": st, "sample_id": r["sample_id"], "error": type(e).__name__ + ": " + str(e)[:150]})
+            continue
+        live = cache[key]
         m = [y for y in live if y["SampleId"] == r["sample_id"]]
         rec = {"state": st, "param": p, "sample_id": r["sample_id"], "found_live": bool(m)}
         if m:
@@ -36,8 +44,9 @@ def main():
     keys = ["value_match", "limits_match_stored", "limits_match_IS10500_pinned", "lab_match", "tested_match"]
     mism = [o for o in out if not o["found_live"] or not all(o.get(k) for k in keys)]
     res = {"method": "AI-assisted re-comparison against live WQMIS (re-fetched per village); not a human check; same author/tooling as the collector",
-           "run_utc": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "records": len(out), "mismatching_records": len(mism), "details": out}
-    (ROOT / "eval" / "results" / "recheck_live_10.json").write_text(json.dumps(res, indent=1, ensure_ascii=False))
+           "run_utc": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "records_requested": len(cases), "records": len(out), "fetch_errors": len(errors), "errors": errors, "mismatching_records": len(mism), "details": out}
+    (ROOT / "eval" / "results" / "recheck_live_60.json").write_text(json.dumps(res, indent=1, ensure_ascii=False))
+    print(res["records_requested"], res["records"], res["mismatching_records"], res["fetch_errors"])
     print(len(out), "records,", len(mism), "mismatching"); [print(json.dumps(m, ensure_ascii=False)) for m in mism]
 
 if __name__ == "__main__": main()

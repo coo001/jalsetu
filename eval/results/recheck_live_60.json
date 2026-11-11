@@ -1,0 +1,1091 @@
+{
+ "method": "AI-assisted re-comparison against live WQMIS (re-fetched per village); not a human check; same author/tooling as the collector",
+ "run_utc": "2026-11-11T01:32:32Z",
+ "records_requested": 60,
+ "records": 60,
+ "fetch_errors": 0,
+ "errors": [],
+ "mismatching_records": 0,
+ "details": [
+  {
+   "state": "AP",
+   "param": "Fluoride",
+   "sample_id": "U713978S20854382",
+   "found_live": true,
+   "live_value": "2.040 (mg/l)",
+   "stored_value": "2.040 (mg/l)",
+   "value_match": true,
+   "live_limits": [
+    "1",
+    "1.5"
+   ],
+   "limits_match_stored": true,
+   "limits_match_IS10500_pinned": true,
+   "lab_match": true,
+   "tested_match": true,
+   "exceeds_by_hand": true
+  },
+  {
+   "state": "AP",
+   "param": "Fluoride",
+   "sample_id": "U713978S20862069",
+   "found_live": true,
+   "live_value": "2.100 (mg/l)",
+   "stored_value": "2.100 (mg/l)",
+   "value_match": true,
+   "live_limits": [
+    "1",
+    "1.5"
+   ],
+   "limits_match_stored": true,
+   "limits_match_IS10500_pinned": true,
+   "lab_match": true,
+   "tested_match": true,
+   "exceeds_by_hand": true
+  },
+  {
+   "state": "AP",
+   "param": "Fluoride",
+   "sample_id": "U709176S19712329",
+   "found_live": true,
+   "live_value": "1.870 (mg/l)",
+   "stored_value": "1.870 (mg/l)",
+   "value_match": true,
+   "live_limits": [
+    "1",
+    "1.5"
+   ],
+   "limits_match_stored": true,
+   "limits_match_IS10500_pinned": true,
+   "lab_match": true,
+   "tested_match": true,
+   "exceeds_by_hand": true
+  },
+  {
+   "state": "AP",
+   "param": "Fluoride",
+   "sample_id": "U709176S19726755",
+   "found_live": true,
+   "live_value": "2.300 (mg/l)",
+   "stored_value": "2.300 (mg/l)",
+   "value_match": true,
+   "live_limits": [
+    "1",
+    "1.5"
+   ],
+   "limits_match_stored": true,
+   "limits_match_IS10500_pinned": true,
+   "lab_match": true,
+   "tested_match": true,
+   "exceeds_by_hand": true
+  },
+  {
+   "state": "AP",
+   "param": "Fluoride",
+   "sample_id": "U704038S21469166",
+   "found_live": true,
+   "live_value": "1.600 (mg/l)",
+   "stored_value": "1.600 (mg/l)",
+   "value_match": true,
+   "live_limits": [
+    "1",
+    "1.5"
+   ],
+   "limits_match_stored": true,
+   "limits_match_IS10500_pinned": true,
+   "lab_match": true,
+   "tested_match": true,
+   "exceeds_by_hand": true
+  },
+  {
+   "state": "AP",
+   "param": "Nitrate",
+   "sample_id": "U728079S19689918",
+   "found_live": true,
+   "live_value": "47.200 (mg/l)",
+   "stored_value": "47.200 (mg/l)",
+   "value_match": true,
+   "live_limits": [
+    "45",
+    "45"
+   ],
+   "limits_match_stored": true,
+   "limits_match_IS10500_pinned": true,
+   "lab_match": true,
+   "tested_match": true,
+   "exceeds_by_hand": true
+  },
+  {
+   "state": "AP",
+   "param": "Fluoride",
+   "sample_id": "U709176S19562895",
+   "found_live": true,
+   "live_value": "2.060 (mg/l)",
+   "stored_value": "2.060 (mg/l)",
+   "value_match": true,
+   "live_limits": [
+    "1",
+    "1.5"
+   ],
+   "limits_match_stored": true,
+   "limits_match_IS10500_pinned": true,
+   "lab_match": true,
+   "tested_match": true,
+   "exceeds_by_hand": true
+  },
+  {
+   "state": "AP",
+   "param": "Fluoride",
+   "sample_id": "U714260S24254517",
+   "found_live": true,
+   "live_value": "1.890 (mg/l)",
+   "stored_value": "1.890 (mg/l)",
+   "value_match": true,
+   "live_limits": [
+    "1",
+    "1.5"
+   ],
+   "limits_match_stored": true,
+   "limits_match_IS10500_pinned": true,
+   "lab_match": true,
+   "tested_match": true,
+   "exceeds_by_hand": true
+  },
+  {
+   "state": "AP",
+   "param": "Nitrate",
+   "sample_id": "U704038S20837681",
+   "found_live": true,
+   "live_value": "60.400 (mg/l)",
+   "stored_value": "60.400 (mg/l)",
+   "value_match": true,
+   "live_limits": [
+    "45",
+    "45"
+   ],
+   "limits_match_stored": true,
+   "limits_match_IS10500_pinned": true,
+   "lab_match": true,
+   "tested_match": true,
+   "exceeds_by_hand": true
+  },
+  {
+   "state": "AP",
+   "param": "Fluoride",
+   "sample_id": "U704038S20837491",
+   "found_live": true,
+   "live_value": "1.510 (mg/l)",
+   "stored_value": "1.510 (mg/l)",
+   "value_match": true,
+   "live_limits": [
+    "1",
+    "1.5"
+   ],
+   "limits_match_stored": true,
+   "limits_match_IS10500_pinned": true,
+   "lab_match": true,
+   "tested_match": true,
+   "exceeds_by_hand": true
+  },
+  {
+   "state": "AP",
+   "param": "Nitrate",
+   "sample_id": "U704038S20837491",
+   "found_live": true,
+   "live_value": "60.800 (mg/l)",
+   "stored_value": "60.800 (mg/l)",
+   "value_match": true,
+   "live_limits": [
+    "45",
+    "45"
+   ],
+   "limits_match_stored": true,
+   "limits_match_IS10500_pinned": true,
+   "lab_match": true,
+   "tested_match": true,
+   "exceeds_by_hand": true
+  },
+  {
+   "state": "AP",
+   "param": "Fluoride",
+   "sample_id": "U709176S19562925",
+   "found_live": true,
+   "live_value": "2.250 (mg/l)",
+   "stored_value": "2.250 (mg/l)",
+   "value_match": true,
+   "live_limits": [
+    "1",
+    "1.5"
+   ],
+   "limits_match_stored": true,
+   "limits_match_IS10500_pinned": true,
+   "lab_match": true,
+   "tested_match": true,
+   "exceeds_by_hand": true
+  },
+  {
+   "state": "AP",
+   "param": "Fluoride",
+   "sample_id": "U709176S19562892",
+   "found_live": true,
+   "live_value": "1.950 (mg/l)",
+   "stored_value": "1.950 (mg/l)",
+   "value_match": true,
+   "live_limits": [
+    "1",
+    "1.5"
+   ],
+   "limits_match_stored": true,
+   "limits_match_IS10500_pinned": true,
+   "lab_match": true,
+   "tested_match": true,
+   "exceeds_by_hand": true
+  },
+  {
+   "state": "AP",
+   "param": "Fluoride",
+   "sample_id": "U709176S19712242",
+   "found_live": true,
+   "live_value": "2.060 (mg/l)",
+   "stored_value": "2.060 (mg/l)",
+   "value_match": true,
+   "live_limits": [
+    "1",
+    "1.5"
+   ],
+   "limits_match_stored": true,
+   "limits_match_IS10500_pinned": true,
+   "lab_match": true,
+   "tested_match": true,
+   "exceeds_by_hand": true
+  },
+  {
+   "state": "AP",
+   "param": "Fluoride",
+   "sample_id": "U709176S19544512",
+   "found_live": true,
+   "live_value": "1.880 (mg/l)",
+   "stored_value": "1.880 (mg/l)",
+   "value_match": true,
+   "live_limits": [
+    "1",
+    "1.5"
+   ],
+   "limits_match_stored": true,
+   "limits_match_IS10500_pinned": true,
+   "lab_match": true,
+   "tested_match": true,
+   "exceeds_by_hand": true
+  },
+  {
+   "state": "AP",
+   "param": "Fluoride",
+   "sample_id": "U709176S19728957",
+   "found_live": true,
+   "live_value": "1.960 (mg/l)",
+   "stored_value": "1.960 (mg/l)",
+   "value_match": true,
+   "live_limits": [
+    "1",
+    "1.5"
+   ],
+   "limits_match_stored": true,
+   "limits_match_IS10500_pinned": true,
+   "lab_match": true,
+   "tested_match": true,
+   "exceeds_by_hand": true
+  },
+  {
+   "state": "AP",
+   "param": "Fluoride",
+   "sample_id": "U709176S19712541",
+   "found_live": true,
+   "live_value": "2.300 (mg/l)",
+   "stored_value": "2.300 (mg/l)",
+   "value_match": true,
+   "live_limits": [
+    "1",
+    "1.5"
+   ],
+   "limits_match_stored": true,
+   "limits_match_IS10500_pinned": true,
+   "lab_match": true,
+   "tested_match": true,
+   "exceeds_by_hand": true
+  },
+  {
+   "state": "AP",
+   "param": "Nitrate",
+   "sample_id": "U724008S23633020",
+   "found_live": true,
+   "live_value": "65.500 (mg/l)",
+   "stored_value": "65.500 (mg/l)",
+   "value_match": true,
+   "live_limits": [
+    "45",
+    "45"
+   ],
+   "limits_match_stored": true,
+   "limits_match_IS10500_pinned": true,
+   "lab_match": true,
+   "tested_match": true,
+   "exceeds_by_hand": true
+  },
+  {
+   "state": "AP",
+   "param": "Nitrate",
+   "sample_id": "U1645997S23453545",
+   "found_live": true,
+   "live_value": "50.300 (mg/l)",
+   "stored_value": "50.300 (mg/l)",
+   "value_match": true,
+   "live_limits": [
+    "45",
+    "45"
+   ],
+   "limits_match_stored": true,
+   "limits_match_IS10500_pinned": true,
+   "lab_match": true,
+   "tested_match": true,
+   "exceeds_by_hand": true
+  },
+  {
+   "state": "AP",
+   "param": "Fluoride",
+   "sample_id": "U1904307S24135877",
+   "found_live": true,
+   "live_value": "2.400 (mg/l)",
+   "stored_value": "2.400 (mg/l)",
+   "value_match": true,
+   "live_limits": [
+    "1",
+    "1.5"
+   ],
+   "limits_match_stored": true,
+   "limits_match_IS10500_pinned": true,
+   "lab_match": true,
+   "tested_match": true,
+   "exceeds_by_hand": true
+  },
+  {
+   "state": "AP",
+   "param": "Nitrate",
+   "sample_id": "U723297S19539779",
+   "found_live": true,
+   "live_value": "46.900 (mg/l)",
+   "stored_value": "46.900 (mg/l)",
+   "value_match": true,
+   "live_limits": [
+    "45",
+    "45"
+   ],
+   "limits_match_stored": true,
+   "limits_match_IS10500_pinned": true,
+   "lab_match": true,
+   "tested_match": true,
+   "exceeds_by_hand": true
+  },
+  {
+   "state": "AP",
+   "param": "Fluoride",
+   "sample_id": "U704038S20094309",
+   "found_live": true,
+   "live_value": "2.100 (mg/l)",
+   "stored_value": "2.100 (mg/l)",
+   "value_match": true,
+   "live_limits": [
+    "1",
+    "1.5"
+   ],
+   "limits_match_stored": true,
+   "limits_match_IS10500_pinned": true,
+   "lab_match": true,
+   "tested_match": true,
+   "exceeds_by_hand": true
+  },
+  {
+   "state": "AP",
+   "param": "Fluoride",
+   "sample_id": "U709176S19562901",
+   "found_live": true,
+   "live_value": "1.940 (mg/l)",
+   "stored_value": "1.940 (mg/l)",
+   "value_match": true,
+   "live_limits": [
+    "1",
+    "1.5"
+   ],
+   "limits_match_stored": true,
+   "limits_match_IS10500_pinned": true,
+   "lab_match": true,
+   "tested_match": true,
+   "exceeds_by_hand": true
+  },
+  {
+   "state": "AP",
+   "param": "Fluoride",
+   "sample_id": "U704740S25774352",
+   "found_live": true,
+   "live_value": "1.520 (mg/l)",
+   "stored_value": "1.520 (mg/l)",
+   "value_match": true,
+   "live_limits": [
+    "1",
+    "1.5"
+   ],
+   "limits_match_stored": true,
+   "limits_match_IS10500_pinned": true,
+   "lab_match": true,
+   "tested_match": true,
+   "exceeds_by_hand": true
+  },
+  {
+   "state": "AP",
+   "param": "Fluoride",
+   "sample_id": "U704038S20094301",
+   "found_live": true,
+   "live_value": "2.300 (mg/l)",
+   "stored_value": "2.300 (mg/l)",
+   "value_match": true,
+   "live_limits": [
+    "1",
+    "1.5"
+   ],
+   "limits_match_stored": true,
+   "limits_match_IS10500_pinned": true,
+   "lab_match": true,
+   "tested_match": true,
+   "exceeds_by_hand": true
+  },
+  {
+   "state": "AP",
+   "param": "Fluoride",
+   "sample_id": "U704038S24873760",
+   "found_live": true,
+   "live_value": "2.300 (mg/l)",
+   "stored_value": "2.300 (mg/l)",
+   "value_match": true,
+   "live_limits": [
+    "1",
+    "1.5"
+   ],
+   "limits_match_stored": true,
+   "limits_match_IS10500_pinned": true,
+   "lab_match": true,
+   "tested_match": true,
+   "exceeds_by_hand": true
+  },
+  {
+   "state": "AP",
+   "param": "Fluoride",
+   "sample_id": "U709176S19544548",
+   "found_live": true,
+   "live_value": "1.770 (mg/l)",
+   "stored_value": "1.770 (mg/l)",
+   "value_match": true,
+   "live_limits": [
+    "1",
+    "1.5"
+   ],
+   "limits_match_stored": true,
+   "limits_match_IS10500_pinned": true,
+   "lab_match": true,
+   "tested_match": true,
+   "exceeds_by_hand": true
+  },
+  {
+   "state": "AP",
+   "param": "Fluoride",
+   "sample_id": "U709176S19563033",
+   "found_live": true,
+   "live_value": "1.920 (mg/l)",
+   "stored_value": "1.920 (mg/l)",
+   "value_match": true,
+   "live_limits": [
+    "1",
+    "1.5"
+   ],
+   "limits_match_stored": true,
+   "limits_match_IS10500_pinned": true,
+   "lab_match": true,
+   "tested_match": true,
+   "exceeds_by_hand": true
+  },
+  {
+   "state": "AP",
+   "param": "Fluoride",
+   "sample_id": "U709176S19563063",
+   "found_live": true,
+   "live_value": "1.600 (mg/l)",
+   "stored_value": "1.600 (mg/l)",
+   "value_match": true,
+   "live_limits": [
+    "1",
+    "1.5"
+   ],
+   "limits_match_stored": true,
+   "limits_match_IS10500_pinned": true,
+   "lab_match": true,
+   "tested_match": true,
+   "exceeds_by_hand": true
+  },
+  {
+   "state": "AP",
+   "param": "Nitrate",
+   "sample_id": "U711594S23399782",
+   "found_live": true,
+   "live_value": "61.900 (mg/l)",
+   "stored_value": "61.900 (mg/l)",
+   "value_match": true,
+   "live_limits": [
+    "45",
+    "45"
+   ],
+   "limits_match_stored": true,
+   "limits_match_IS10500_pinned": true,
+   "lab_match": true,
+   "tested_match": true,
+   "exceeds_by_hand": true
+  },
+  {
+   "state": "BR",
+   "param": "Total arsenic",
+   "sample_id": "U703835S25157302",
+   "found_live": true,
+   "live_value": "0.100 (mg/l)",
+   "stored_value": "0.100 (mg/l)",
+   "value_match": true,
+   "live_limits": [
+    "0.01",
+    "0.01"
+   ],
+   "limits_match_stored": true,
+   "limits_match_IS10500_pinned": true,
+   "lab_match": true,
+   "tested_match": true,
+   "exceeds_by_hand": true
+  },
+  {
+   "state": "BR",
+   "param": "Total arsenic",
+   "sample_id": "U701316S23970155",
+   "found_live": true,
+   "live_value": "0.013 (mg/l)",
+   "stored_value": "0.013 (mg/l)",
+   "value_match": true,
+   "live_limits": [
+    "0.01",
+    "0.01"
+   ],
+   "limits_match_stored": true,
+   "limits_match_IS10500_pinned": true,
+   "lab_match": true,
+   "tested_match": true,
+   "exceeds_by_hand": true
+  },
+  {
+   "state": "BR",
+   "param": "Total arsenic",
+   "sample_id": "U714185S19553115",
+   "found_live": true,
+   "live_value": "0.012 (mg/l)",
+   "stored_value": "0.012 (mg/l)",
+   "value_match": true,
+   "live_limits": [
+    "0.01",
+    "0.01"
+   ],
+   "limits_match_stored": true,
+   "limits_match_IS10500_pinned": true,
+   "lab_match": true,
+   "tested_match": true,
+   "exceeds_by_hand": true
+  },
+  {
+   "state": "BR",
+   "param": "Total arsenic",
+   "sample_id": "U735548S22704813",
+   "found_live": true,
+   "live_value": "0.220 (mg/l)",
+   "stored_value": "0.220 (mg/l)",
+   "value_match": true,
+   "live_limits": [
+    "0.01",
+    "0.01"
+   ],
+   "limits_match_stored": true,
+   "limits_match_IS10500_pinned": true,
+   "lab_match": true,
+   "tested_match": true,
+   "exceeds_by_hand": true
+  },
+  {
+   "state": "BR",
+   "param": "Total arsenic",
+   "sample_id": "U701316S22803371",
+   "found_live": true,
+   "live_value": "0.016 (mg/l)",
+   "stored_value": "0.016 (mg/l)",
+   "value_match": true,
+   "live_limits": [
+    "0.01",
+    "0.01"
+   ],
+   "limits_match_stored": true,
+   "limits_match_IS10500_pinned": true,
+   "lab_match": true,
+   "tested_match": true,
+   "exceeds_by_hand": true
+  },
+  {
+   "state": "BR",
+   "param": "Total arsenic",
+   "sample_id": "U735548S22720651",
+   "found_live": true,
+   "live_value": "0.021 (mg/l)",
+   "stored_value": "0.021 (mg/l)",
+   "value_match": true,
+   "live_limits": [
+    "0.01",
+    "0.01"
+   ],
+   "limits_match_stored": true,
+   "limits_match_IS10500_pinned": true,
+   "lab_match": true,
+   "tested_match": true,
+   "exceeds_by_hand": true
+  },
+  {
+   "state": "BR",
+   "param": "Total arsenic",
+   "sample_id": "U701316S22846643",
+   "found_live": true,
+   "live_value": "0.023 (mg/l)",
+   "stored_value": "0.023 (mg/l)",
+   "value_match": true,
+   "live_limits": [
+    "0.01",
+    "0.01"
+   ],
+   "limits_match_stored": true,
+   "limits_match_IS10500_pinned": true,
+   "lab_match": true,
+   "tested_match": true,
+   "exceeds_by_hand": true
+  },
+  {
+   "state": "BR",
+   "param": "Total arsenic",
+   "sample_id": "U735548S21679588",
+   "found_live": true,
+   "live_value": "0.021 (mg/l)",
+   "stored_value": "0.021 (mg/l)",
+   "value_match": true,
+   "live_limits": [
+    "0.01",
+    "0.01"
+   ],
+   "limits_match_stored": true,
+   "limits_match_IS10500_pinned": true,
+   "lab_match": true,
+   "tested_match": true,
+   "exceeds_by_hand": true
+  },
+  {
+   "state": "BR",
+   "param": "Total arsenic",
+   "sample_id": "U703835S22908511",
+   "found_live": true,
+   "live_value": "0.013 (mg/l)",
+   "stored_value": "0.013 (mg/l)",
+   "value_match": true,
+   "live_limits": [
+    "0.01",
+    "0.01"
+   ],
+   "limits_match_stored": true,
+   "limits_match_IS10500_pinned": true,
+   "lab_match": true,
+   "tested_match": true,
+   "exceeds_by_hand": true
+  },
+  {
+   "state": "BR",
+   "param": "Total arsenic",
+   "sample_id": "U701316S24682127",
+   "found_live": true,
+   "live_value": "0.012 (mg/l)",
+   "stored_value": "0.012 (mg/l)",
+   "value_match": true,
+   "live_limits": [
+    "0.01",
+    "0.01"
+   ],
+   "limits_match_stored": true,
+   "limits_match_IS10500_pinned": true,
+   "lab_match": true,
+   "tested_match": true,
+   "exceeds_by_hand": true
+  },
+  {
+   "state": "BR",
+   "param": "Total arsenic",
+   "sample_id": "U703835S25157356",
+   "found_live": true,
+   "live_value": "0.100 (mg/l)",
+   "stored_value": "0.100 (mg/l)",
+   "value_match": true,
+   "live_limits": [
+    "0.01",
+    "0.01"
+   ],
+   "limits_match_stored": true,
+   "limits_match_IS10500_pinned": true,
+   "lab_match": true,
+   "tested_match": true,
+   "exceeds_by_hand": true
+  },
+  {
+   "state": "BR",
+   "param": "Total arsenic",
+   "sample_id": "U735548S22680522",
+   "found_live": true,
+   "live_value": "0.025 (mg/l)",
+   "stored_value": "0.025 (mg/l)",
+   "value_match": true,
+   "live_limits": [
+    "0.01",
+    "0.01"
+   ],
+   "limits_match_stored": true,
+   "limits_match_IS10500_pinned": true,
+   "lab_match": true,
+   "tested_match": true,
+   "exceeds_by_hand": true
+  },
+  {
+   "state": "BR",
+   "param": "Total arsenic",
+   "sample_id": "U1218511S22334475",
+   "found_live": true,
+   "live_value": "0.013 (mg/l)",
+   "stored_value": "0.013 (mg/l)",
+   "value_match": true,
+   "live_limits": [
+    "0.01",
+    "0.01"
+   ],
+   "limits_match_stored": true,
+   "limits_match_IS10500_pinned": true,
+   "lab_match": true,
+   "tested_match": true,
+   "exceeds_by_hand": true
+  },
+  {
+   "state": "BR",
+   "param": "Total arsenic",
+   "sample_id": "U735548S22680672",
+   "found_live": true,
+   "live_value": "0.023 (mg/l)",
+   "stored_value": "0.023 (mg/l)",
+   "value_match": true,
+   "live_limits": [
+    "0.01",
+    "0.01"
+   ],
+   "limits_match_stored": true,
+   "limits_match_IS10500_pinned": true,
+   "lab_match": true,
+   "tested_match": true,
+   "exceeds_by_hand": true
+  },
+  {
+   "state": "BR",
+   "param": "Total arsenic",
+   "sample_id": "U735548S22743340",
+   "found_live": true,
+   "live_value": "0.025 (mg/l)",
+   "stored_value": "0.025 (mg/l)",
+   "value_match": true,
+   "live_limits": [
+    "0.01",
+    "0.01"
+   ],
+   "limits_match_stored": true,
+   "limits_match_IS10500_pinned": true,
+   "lab_match": true,
+   "tested_match": true,
+   "exceeds_by_hand": true
+  },
+  {
+   "state": "BR",
+   "param": "Total arsenic",
+   "sample_id": "U703835S22908937",
+   "found_live": true,
+   "live_value": "0.013 (mg/l)",
+   "stored_value": "0.013 (mg/l)",
+   "value_match": true,
+   "live_limits": [
+    "0.01",
+    "0.01"
+   ],
+   "limits_match_stored": true,
+   "limits_match_IS10500_pinned": true,
+   "lab_match": true,
+   "tested_match": true,
+   "exceeds_by_hand": true
+  },
+  {
+   "state": "BR",
+   "param": "Total arsenic",
+   "sample_id": "U701316S22668250",
+   "found_live": true,
+   "live_value": "0.026 (mg/l)",
+   "stored_value": "0.026 (mg/l)",
+   "value_match": true,
+   "live_limits": [
+    "0.01",
+    "0.01"
+   ],
+   "limits_match_stored": true,
+   "limits_match_IS10500_pinned": true,
+   "lab_match": true,
+   "tested_match": true,
+   "exceeds_by_hand": true
+  },
+  {
+   "state": "BR",
+   "param": "Total arsenic",
+   "sample_id": "U735548S22718995",
+   "found_live": true,
+   "live_value": "0.029 (mg/l)",
+   "stored_value": "0.029 (mg/l)",
+   "value_match": true,
+   "live_limits": [
+    "0.01",
+    "0.01"
+   ],
+   "limits_match_stored": true,
+   "limits_match_IS10500_pinned": true,
+   "lab_match": true,
+   "tested_match": true,
+   "exceeds_by_hand": true
+  },
+  {
+   "state": "BR",
+   "param": "Total arsenic",
+   "sample_id": "U735548S22825293",
+   "found_live": true,
+   "live_value": "0.023 (mg/l)",
+   "stored_value": "0.023 (mg/l)",
+   "value_match": true,
+   "live_limits": [
+    "0.01",
+    "0.01"
+   ],
+   "limits_match_stored": true,
+   "limits_match_IS10500_pinned": true,
+   "lab_match": true,
+   "tested_match": true,
+   "exceeds_by_hand": true
+  },
+  {
+   "state": "BR",
+   "param": "Total arsenic",
+   "sample_id": "U701316S22694736",
+   "found_live": true,
+   "live_value": "0.028 (mg/l)",
+   "stored_value": "0.028 (mg/l)",
+   "value_match": true,
+   "live_limits": [
+    "0.01",
+    "0.01"
+   ],
+   "limits_match_stored": true,
+   "limits_match_IS10500_pinned": true,
+   "lab_match": true,
+   "tested_match": true,
+   "exceeds_by_hand": true
+  },
+  {
+   "state": "BR",
+   "param": "Total arsenic",
+   "sample_id": "U701316S22808704",
+   "found_live": true,
+   "live_value": "0.018 (mg/l)",
+   "stored_value": "0.018 (mg/l)",
+   "value_match": true,
+   "live_limits": [
+    "0.01",
+    "0.01"
+   ],
+   "limits_match_stored": true,
+   "limits_match_IS10500_pinned": true,
+   "lab_match": true,
+   "tested_match": true,
+   "exceeds_by_hand": true
+  },
+  {
+   "state": "BR",
+   "param": "Total arsenic",
+   "sample_id": "U735548S22741461",
+   "found_live": true,
+   "live_value": "0.024 (mg/l)",
+   "stored_value": "0.024 (mg/l)",
+   "value_match": true,
+   "live_limits": [
+    "0.01",
+    "0.01"
+   ],
+   "limits_match_stored": true,
+   "limits_match_IS10500_pinned": true,
+   "lab_match": true,
+   "tested_match": true,
+   "exceeds_by_hand": true
+  },
+  {
+   "state": "BR",
+   "param": "Total arsenic",
+   "sample_id": "U701316S23162701",
+   "found_live": true,
+   "live_value": "0.011 (mg/l)",
+   "stored_value": "0.011 (mg/l)",
+   "value_match": true,
+   "live_limits": [
+    "0.01",
+    "0.01"
+   ],
+   "limits_match_stored": true,
+   "limits_match_IS10500_pinned": true,
+   "lab_match": true,
+   "tested_match": true,
+   "exceeds_by_hand": true
+  },
+  {
+   "state": "BR",
+   "param": "Total arsenic",
+   "sample_id": "U735548S22846452",
+   "found_live": true,
+   "live_value": "0.033 (mg/l)",
+   "stored_value": "0.033 (mg/l)",
+   "value_match": true,
+   "live_limits": [
+    "0.01",
+    "0.01"
+   ],
+   "limits_match_stored": true,
+   "limits_match_IS10500_pinned": true,
+   "lab_match": true,
+   "tested_match": true,
+   "exceeds_by_hand": true
+  },
+  {
+   "state": "BR",
+   "param": "Total arsenic",
+   "sample_id": "U701316S23163157",
+   "found_live": true,
+   "live_value": "0.013 (mg/l)",
+   "stored_value": "0.013 (mg/l)",
+   "value_match": true,
+   "live_limits": [
+    "0.01",
+    "0.01"
+   ],
+   "limits_match_stored": true,
+   "limits_match_IS10500_pinned": true,
+   "lab_match": true,
+   "tested_match": true,
+   "exceeds_by_hand": true
+  },
+  {
+   "state": "BR",
+   "param": "Total arsenic",
+   "sample_id": "U735548S22680652",
+   "found_live": true,
+   "live_value": "0.023 (mg/l)",
+   "stored_value": "0.023 (mg/l)",
+   "value_match": true,
+   "live_limits": [
+    "0.01",
+    "0.01"
+   ],
+   "limits_match_stored": true,
+   "limits_match_IS10500_pinned": true,
+   "lab_match": true,
+   "tested_match": true,
+   "exceeds_by_hand": true
+  },
+  {
+   "state": "BR",
+   "param": "Total arsenic",
+   "sample_id": "U701316S24684873",
+   "found_live": true,
+   "live_value": "0.014 (mg/l)",
+   "stored_value": "0.014 (mg/l)",
+   "value_match": true,
+   "live_limits": [
+    "0.01",
+    "0.01"
+   ],
+   "limits_match_stored": true,
+   "limits_match_IS10500_pinned": true,
+   "lab_match": true,
+   "tested_match": true,
+   "exceeds_by_hand": true
+  },
+  {
+   "state": "BR",
+   "param": "Total arsenic",
+   "sample_id": "U735548S22211070",
+   "found_live": true,
+   "live_value": "0.022 (mg/l)",
+   "stored_value": "0.022 (mg/l)",
+   "value_match": true,
+   "live_limits": [
+    "0.01",
+    "0.01"
+   ],
+   "limits_match_stored": true,
+   "limits_match_IS10500_pinned": true,
+   "lab_match": true,
+   "tested_match": true,
+   "exceeds_by_hand": true
+  },
+  {
+   "state": "BR",
+   "param": "Total arsenic",
+   "sample_id": "U1218511S22337493",
+   "found_live": true,
+   "live_value": "0.012 (mg/l)",
+   "stored_value": "0.012 (mg/l)",
+   "value_match": true,
+   "live_limits": [
+    "0.01",
+    "0.01"
+   ],
+   "limits_match_stored": true,
+   "limits_match_IS10500_pinned": true,
+   "lab_match": true,
+   "tested_match": true,
+   "exceeds_by_hand": true
+  },
+  {
+   "state": "BR",
+   "param": "Total arsenic",
+   "sample_id": "U701316S22807448",
+   "found_live": true,
+   "live_value": "0.016 (mg/l)",
+   "stored_value": "0.016 (mg/l)",
+   "value_match": true,
+   "live_limits": [
+    "0.01",
+    "0.01"
+   ],
+   "limits_match_stored": true,
+   "limits_match_IS10500_pinned": true,
+   "lab_match": true,
+   "tested_match": true,
+   "exceeds_by_hand": true
+  }
+ ]
+}

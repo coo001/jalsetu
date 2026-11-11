@@ -15,14 +15,21 @@ packet stops with `needs_review` and the reasons, and produces **no advice and n
 All decisions are deterministic code. An LLM is optional and may only reword the letter; the app works fully
 without any API key.
 
-Live demo: https://jalsetu-5ftx.onrender.com (Render free tier; the first request after idle can take about a minute)  
+**Judge path (2 minutes):** open the [live demo](https://jalsetu-5ftx.onrender.com) (free tier; first request after idle can take about a minute) → `/queue` → click any sample → read the packet (verdict, candidate labs, sourced advice, letter draft) and the agent trace; ambiguous records stop at `needs_review` with no advice. `/eval` shows the measured checks.
+
 Source: https://github.com/coo001/jalsetu
 
-## Impact
+## What is verified, what is estimated, what is not there
 
-No field users or remediation outcomes yet (solo builder, no local partner). The numbers below are reproducible checks on real government records, not impact.
+| | Status |
+|---|---|
+| Field users, remediation outcomes, lab or agency adoption | **None.** Solo builder in Korea, no local partner. No impact is claimed. |
+| Runs on real government records | **Verified:** 283 Andhra Pradesh records (all parameters) + 592 Bihar arsenic records from public WQMIS, hash-pinned snapshot; 115 tests; `make eval` all targets met. |
+| Records re-fetched from live WQMIS and compared (AI-assisted, same author, not a human check) | **Verified:** 60 of 60 public-sample records, 0 mismatching, 0 fetch errors (`eval/results/recheck_live_60.json`). |
+| Scale of the problem, from public data | **Estimate:** WQMIS FY 2024-25 lists 15,217 village-parameter entries with at least one sample above the BIS limit across 34 states and UTs (nitrate 7,443; E. coli 3,739; fluoride 3,430; arsenic 605; `data/snapshots/2026-11-09/wq6_states_2024-2025.csv`). A village can appear under several parameters, so this is not a count of people. This repo processes 875 sample records from 2 states; other states would need their own snapshots. Each flagged entry still needs a verdict, a lab and a request letter; that is the workload JalSetu drafts. |
+| Arsenic limit source | Third-party consolidated BIS copy and a scan of Amendment No.1; **not** the official BIS portal. |
 
-### Wording limits
+## Wording limits
 
 - JalSetu produces next-action packets and letter drafts; it does not deliver them or fix contamination.
 - E1 reproduces the government's contaminated list (283 AP + 592 BR records); it is not independent accuracy and
@@ -159,8 +166,8 @@ Notes on what these numbers mean:
 ### Same-author second-implementation check of the public samples
 `python eval/independent_check.py AP` and `... BR` re-derive selection, verdict, ratio, lab capability, same-district flag and advice ids for `eval/public_sample_30.csv` and `eval/public_sample_30_BR.csv` from the raw CSVs without importing `jalsetu`. Result 2026-11-09: AP 300/300 checks, BR 300/300 checks, 0 mismatching rows (`eval/results/independent_check_30*.json`). This is a same-author second implementation (not independent verification), and not an external or field validation. Five AP rows were also checked by hand (value ÷ limit, lab parameter list, district match): no discrepancy.
 
-### AI-assisted re-comparison against live WQMIS (10 records)
-`python eval/recheck_live.py` takes the first 5 AP and the first 5 BR records of the public samples, re-fetches each record's village from WQMIS, and compares value, limits (against the stored row and against the pinned IS 10500 table values), lab and test date. Result (`eval/results/recheck_live_10.json`, run 2026-11-10T01:37:00Z): 10 records compared, 0 mismatching records. This is AI-assisted, not a human check; it uses the same author/tooling as the collector; it covers 10 of the 60 public-sample records (30 per state sample), out of 875 stored records (283 AP + 592 BR).
+### AI-assisted re-comparison against live WQMIS (60 records)
+`python eval/recheck_live.py [N_per_state]` (default 30) takes the first N AP and first N BR records of the public samples, re-fetches each record's village from WQMIS, and compares value, limits (against the stored row and against the pinned IS 10500 table values), lab and test date. Result (`eval/results/recheck_live_60.json`, run 2026-11-11): 60 requested, 60 compared, 0 mismatching records, 0 fetch errors (any failure would be listed under `errors`, not hidden). AI-assisted, not a human check; same author/tooling as the collector; covers the 60 public-sample records out of 875 stored records (283 AP + 592 BR). An earlier 10-record run is kept in `eval/results/recheck_live_10.json`.
 
 ## Design choices made without asking
 
