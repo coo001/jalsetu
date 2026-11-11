@@ -1,8 +1,8 @@
 {
   "statement": "These are reproducibility and safety checks on real government records, not field impact. No field users or remediation outcomes yet.",
   "command": "python eval/run_eval.py",
-  "git_commit": "77e3b935437a7e9efb59a776e5d90f896dd1cc7a",
-  "timestamp_utc": "2026-11-10T01:39:30Z",
+  "git_commit": "74bffd2052963b9961b2af752e962102207de5c6",
+  "timestamp_utc": "2026-11-11T01:34:03Z",
   "snapshot": "2026-11-09",
   "snapshot_hashes": {
     "br_arsenic_log.json": "98b79f07dfcd4a1ce83cff80149ebedbfe632ba9c86a61673765c89aefcd1c83",
@@ -446,7 +446,7 @@
       "command": "pytest -q tests/test_boundaries.py",
       "passed": 28,
       "failed": 0,
-      "summary": "28 passed in 0.02s"
+      "summary": "28 passed in 0.03s"
     },
     "E6": {
       "packets_checked": 384,
